@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Cyriller.Model;
 
 namespace Cyriller
@@ -14,8 +12,8 @@ namespace Cyriller
 
         public CyrPhrase(CyrNounCollection NounCollection, CyrAdjectiveCollection AdjCollection)
         {
-            this.nounCollection = NounCollection;
-            this.adjCollection = AdjCollection;
+            nounCollection = NounCollection;
+            adjCollection = AdjCollection;
         }
 
         public SpeechPartsEnum DetermineSpeechPart(string Word)
@@ -32,12 +30,12 @@ namespace Cyriller
 
         public CyrResult Decline(string Phrase, GetConditionsEnum Condition)
         {
-            return this.Decline(Phrase, Condition, NumbersEnum.Singular);
+            return Decline(Phrase, Condition, NumbersEnum.Singular);
         }
 
         public CyrResult DeclinePlural(string Phrase, GetConditionsEnum Condition)
         {
-            return this.Decline(Phrase, Condition, NumbersEnum.Plural);
+            return Decline(Phrase, Condition, NumbersEnum.Plural);
         }
 
         protected CyrResult Decline(string Phrase, GetConditionsEnum Condition, NumbersEnum Number)
@@ -50,19 +48,19 @@ namespace Cyriller
             List<object> words = new List<object>();
             string[] parts = Phrase.Split(' ').Select(val => val.Trim()).Where(val => val.IsNotNullOrEmpty()).ToArray();
             List<CyrResult> results = new List<CyrResult>();
-            
+
             foreach (string w in parts)
             {
-                SpeechPartsEnum speech = this.DetermineSpeechPart(w);
+                SpeechPartsEnum speech = DetermineSpeechPart(w);
 
                 switch (speech)
                 {
                     case SpeechPartsEnum.Adjective:
-                        CyrAdjective adj = this.adjCollection.Get(w, Condition);
+                        CyrAdjective adj = adjCollection.Get(w, Condition);
                         words.Add(adj);
                         break;
                     case SpeechPartsEnum.Noun:
-                        CyrNoun noun = this.nounCollection.Get(w, Condition);
+                        CyrNoun noun = nounCollection.Get(w, Condition);
                         words.Add(noun);
                         break;
                     default:
@@ -72,48 +70,16 @@ namespace Cyriller
 
             for (int i = 0; i < words.Count; i++)
             {
-                CyrNoun noun = words[i] as CyrNoun;
-
-                if (noun != null)
+                if (words[i] is CyrNoun noun)
                 {
-                    if (Number == NumbersEnum.Plural)
-                    {
-                        results.Add(noun.DeclinePlural());
-                    }
-                    else
-                    {
-                        results.Add(noun.Decline());
-                    }
-                    
+                    results.Add(Number == NumbersEnum.Plural ? noun.DeclinePlural() : noun.Decline());
                     continue;
                 }
 
                 CyrAdjective adj = words[i] as CyrAdjective;
-                
-                noun = this.GetNextPreviousNoun(words, i);
-
-                if (Number == NumbersEnum.Plural)
-                {
-                    if (noun != null)
-                    {
-                        results.Add(adj.DeclinePlural(noun.Animate));
-                    }
-                    else
-                    {
-                        results.Add(adj.DeclinePlural(AnimatesEnum.Animated));
-                    }
-                }
-                else
-                {
-                    if (noun != null)
-                    {
-                        results.Add(adj.Decline(noun.Animate));
-                    }
-                    else
-                    {
-                        results.Add(adj.Decline(AnimatesEnum.Animated));
-                    }
-                }
+                noun = GetNextPreviousNoun(words, i);
+                AnimatesEnum animate = noun != null ? noun.Animate : AnimatesEnum.Animated;
+                results.Add(Number == NumbersEnum.Plural ? adj.DeclinePlural(animate): adj.Decline(animate));
             }
 
             CyrResult result = results.First();
@@ -128,11 +94,11 @@ namespace Cyriller
 
         protected CyrNoun GetNextPreviousNoun(List<object> Words, int Index)
         {
-            CyrNoun noun = this.GetNextNoun(Words, Index);
+            CyrNoun noun = GetNextNoun(Words, Index);
 
             if (noun == null)
             {
-                noun = this.GetPreviousNoun(Words, Index);
+                noun = GetPreviousNoun(Words, Index);
             }
 
             return noun;

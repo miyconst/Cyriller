@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Cyriller.Model;
 
 namespace Cyriller
@@ -11,37 +10,35 @@ namespace Cyriller
     {
         public CyrResult Decline(long Value)
         {
-            return this.Decline(Value, GendersEnum.Masculine, AnimatesEnum.Inanimated);
+            return Decline(Value, GendersEnum.Masculine, AnimatesEnum.Inanimated);
         }
 
         public CyrResult Decline(long Value, GendersEnum Gender, AnimatesEnum Animate)
         {
-            CyrResult result = new CyrResult(
-                this.ToString(Value, CasesEnum.Nominative, Gender, Animate),
-                this.ToString(Value, CasesEnum.Genitive, Gender, Animate),
-                this.ToString(Value, CasesEnum.Dative, Gender, Animate),
-                this.ToString(Value, CasesEnum.Accusative, Gender, Animate),
-                this.ToString(Value, CasesEnum.Instrumental, Gender, Animate),
-                this.ToString(Value, CasesEnum.Prepositional, Gender, Animate)
+            return new CyrResult(
+                ToString(Value, CasesEnum.Nominative, Gender, Animate),
+                ToString(Value, CasesEnum.Genitive, Gender, Animate),
+                ToString(Value, CasesEnum.Dative, Gender, Animate),
+                ToString(Value, CasesEnum.Accusative, Gender, Animate),
+                ToString(Value, CasesEnum.Instrumental, Gender, Animate),
+                ToString(Value, CasesEnum.Prepositional, Gender, Animate)
             );
-
-            return result;
         }
 
         public CyrResult Decline(decimal Value)
         {
-            return this.Decline(Value, GendersEnum.Masculine, AnimatesEnum.Inanimated);
+            return Decline(Value, GendersEnum.Masculine, AnimatesEnum.Inanimated);
         }
 
         public CyrResult Decline(decimal Value, GendersEnum Gender, AnimatesEnum Animate)
         {
             CyrResult result = new CyrResult(
-                this.ToString(Value, CasesEnum.Nominative, Gender, Animate),
-                this.ToString(Value, CasesEnum.Genitive, Gender, Animate),
-                this.ToString(Value, CasesEnum.Dative, Gender, Animate),
-                this.ToString(Value, CasesEnum.Accusative, Gender, Animate),
-                this.ToString(Value, CasesEnum.Instrumental, Gender, Animate),
-                this.ToString(Value, CasesEnum.Prepositional, Gender, Animate)
+                ToString(Value, CasesEnum.Nominative, Gender, Animate),
+                ToString(Value, CasesEnum.Genitive, Gender, Animate),
+                ToString(Value, CasesEnum.Dative, Gender, Animate),
+                ToString(Value, CasesEnum.Accusative, Gender, Animate),
+                ToString(Value, CasesEnum.Instrumental, Gender, Animate),
+                ToString(Value, CasesEnum.Prepositional, Gender, Animate)
             );
 
             return result;
@@ -50,12 +47,12 @@ namespace Cyriller
         public CyrResult Decline(decimal Value, Currency Currency)
         {
             CyrResult result = new CyrResult(
-                this.ToString(Value, CasesEnum.Nominative, Currency),
-                this.ToString(Value, CasesEnum.Genitive, Currency),
-                this.ToString(Value, CasesEnum.Dative, Currency),
-                this.ToString(Value, CasesEnum.Accusative, Currency),
-                this.ToString(Value, CasesEnum.Instrumental, Currency),
-                this.ToString(Value, CasesEnum.Prepositional, Currency)
+                ToString(Value, CasesEnum.Nominative, Currency),
+                ToString(Value, CasesEnum.Genitive, Currency),
+                ToString(Value, CasesEnum.Dative, Currency),
+                ToString(Value, CasesEnum.Accusative, Currency),
+                ToString(Value, CasesEnum.Instrumental, Currency),
+                ToString(Value, CasesEnum.Prepositional, Currency)
             );
 
             return result;
@@ -64,12 +61,12 @@ namespace Cyriller
         public CyrResult Decline(decimal Value, Item Item)
         {
             CyrResult result = new CyrResult(
-                this.ToString(Value, CasesEnum.Nominative, Item),
-                this.ToString(Value, CasesEnum.Genitive, Item),
-                this.ToString(Value, CasesEnum.Dative, Item),
-                this.ToString(Value, CasesEnum.Accusative, Item),
-                this.ToString(Value, CasesEnum.Instrumental, Item),
-                this.ToString(Value, CasesEnum.Prepositional, Item)
+                ToString(Value, CasesEnum.Nominative, Item),
+                ToString(Value, CasesEnum.Genitive, Item),
+                ToString(Value, CasesEnum.Dative, Item),
+                ToString(Value, CasesEnum.Accusative, Item),
+                ToString(Value, CasesEnum.Instrumental, Item),
+                ToString(Value, CasesEnum.Prepositional, Item)
             );
 
             return result;
@@ -77,12 +74,12 @@ namespace Cyriller
 
         public string ToString(long Value, CasesEnum Case)
         {
-            return this.ToString(Value, Case, GendersEnum.Masculine, AnimatesEnum.Inanimated);
+            return ToString(Value, Case, GendersEnum.Masculine, AnimatesEnum.Inanimated);
         }
 
         public string ToString(decimal Value, CasesEnum Case)
         {
-            return this.ToString(Value, Case, GendersEnum.Masculine, AnimatesEnum.Inanimated);
+            return ToString(Value, Case, GendersEnum.Masculine, AnimatesEnum.Inanimated);
         }
 
         public string ToString(decimal Value, CasesEnum Case, GendersEnum Gender, AnimatesEnum Animate)
@@ -93,7 +90,7 @@ namespace Cyriller
             StringBuilder sb = new StringBuilder();
             Strings s = new Strings(Case, Gender, Animate);
 
-            sb.Append(this.ToString(i, Case, Gender, Animate));
+            sb.Append(ToString(i, Case, Gender, Animate));
 
             if (parts.Length > 1)
             {
@@ -130,7 +127,7 @@ namespace Cyriller
                 sb.Append(" ");
                 sb.Append(this.Case(i, s.Integer[0], s.Integer[1], s.Integer[2]));
                 sb.Append(" и ");
-                sb.Append(this.ToString(d, Case, Gender, Animate));
+                sb.Append(ToString(d, Case, Gender, Animate));
                 sb.Append(" ");
                 sb.Append(this.Case(d, decimals[0], decimals[1], decimals[2]));
             }
@@ -148,7 +145,7 @@ namespace Cyriller
             string[] iname = Currency.GetIntegerName(Case);
             string[] dname = Currency.GetDecimalName(Case);
 
-            sb.Append(this.ToString(i, Case, Currency.IntegerGender, AnimatesEnum.Inanimated));
+            sb.Append(ToString(i, Case, Currency.IntegerGender, AnimatesEnum.Inanimated));
             sb.Append(" ").Append(this.Case(i, iname[0], iname[1], iname[2]));
 
             if (parts.Length > 1)
@@ -176,7 +173,7 @@ namespace Cyriller
                 long d = (long)Math.Round(decimal.Parse(v, System.Globalization.CultureInfo.InvariantCulture.NumberFormat), 0);
 
                 sb.Append(" и ");
-                sb.Append(this.ToString(d, Case, Currency.DecimalGender, AnimatesEnum.Inanimated));
+                sb.Append(ToString(d, Case, Currency.DecimalGender, AnimatesEnum.Inanimated));
                 sb.Append(" ");
                 sb.Append(this.Case(d, dname[0], dname[1], dname[2]));
             }
@@ -193,7 +190,7 @@ namespace Cyriller
             AnimatesEnum animate = i == Value && i < 20 ? Item.Animate : AnimatesEnum.Inanimated;
             string[] name;
 
-            sb.Append(this.ToString(Value, Case, gender, animate)).Append(" ");
+            sb.Append(ToString(Value, Case, gender, animate)).Append(" ");
 
             if (i < Value)
             {
@@ -236,7 +233,7 @@ namespace Cyriller
 
             if (v > 0)
             {
-                r.Append(this.ToString(v, Case, GendersEnum.Masculine, Animate)).Append(" ").Append(this.Case(v, s.Billion[0], s.Billion[1], s.Billion[2])).Append(" ");
+                r.Append(ToString(v, Case, GendersEnum.Masculine, Animate)).Append(" ").Append(this.Case(v, s.Billion[0], s.Billion[1], s.Billion[2])).Append(" ");
                 Value = Value - 1000000000 * v;
             }
 
@@ -244,7 +241,7 @@ namespace Cyriller
 
             if (v > 0)
             {
-                r.Append(this.ToString(v, Case, GendersEnum.Masculine, Animate)).Append(" ").Append(this.Case(v, s.Million[0], s.Million[1], s.Million[2])).Append(" ");
+                r.Append(ToString(v, Case, GendersEnum.Masculine, Animate)).Append(" ").Append(this.Case(v, s.Million[0], s.Million[1], s.Million[2])).Append(" ");
                 Value = Value - 1000000 * v;
             }
 
@@ -252,7 +249,7 @@ namespace Cyriller
 
             if (v > 0)
             {
-                r.Append(this.ToString(v, Case, GendersEnum.Feminine, Animate)).Append(" ").Append(this.Case(v, s.Thousand[0], s.Thousand[1], s.Thousand[2])).Append(" ");
+                r.Append(ToString(v, Case, GendersEnum.Feminine, Animate)).Append(" ").Append(this.Case(v, s.Thousand[0], s.Thousand[1], s.Thousand[2])).Append(" ");
                 Value = Value - 1000 * v;
             }
 

@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Cyriller.Model;
 
 namespace Cyriller
@@ -14,49 +10,33 @@ namespace Cyriller
             protected CyrResult singular;
             protected CyrResult plural;
             protected CyrNoun noun;
+            public GendersEnum Gender => noun.Gender;
+            public AnimatesEnum Animate => noun.Animate;
+
 
             public Item(CyrNoun Noun)
             {
-                this.noun = Noun;
-                this.singular = noun.Decline();
-                this.plural = noun.DeclinePlural();
+                noun = Noun;
+                singular = noun.Decline();
+                plural = noun.DeclinePlural();
             }
 
             public string[] GetName(CasesEnum Case, long Value)
             {
-                if (this.Gender == GendersEnum.Feminine)
+                switch (Gender)
                 {
-                    return GetFeminine(Case);
-                }
-                else if (this.Gender == GendersEnum.Neuter)
-                {
-                    return GetNeuter(Case);
-                }
-                else
-                {
-                    return this.GetMasculine(Case, Value);
-                }
-            }
-
-            public GendersEnum Gender
-            {
-                get
-                {
-                    return this.noun.Gender;
-                }
-            }
-
-            public AnimatesEnum Animate
-            {
-                get
-                {
-                    return this.noun.Animate;
+                    case GendersEnum.Feminine:
+                        return GetFeminine(Case);
+                    case GendersEnum.Neuter:
+                        return GetNeuter(Case);
+                    default:
+                        return GetMasculine(Case, Value);
                 }
             }
 
             protected string[] GetMasculine(CasesEnum Case, long Value)
             {
-                if (this.Animate == AnimatesEnum.Animated && Value < 20)
+                if (Animate == AnimatesEnum.Animated && Value < 20)
                 {
                     switch (Case)
                     {
