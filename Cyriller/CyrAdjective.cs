@@ -1,112 +1,76 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Cyriller.Model;
+﻿using Cyriller.Model;
 
 namespace Cyriller
 {
     public class CyrAdjective
     {
+        /// <summary>Род прилагательного</summary>
         protected GendersEnum gender;
-        protected AnimatesEnum animate;
         protected string name;
         protected string collectionName;
         protected CyrRule[] rules;
+        public GendersEnum Gender => gender;
+        public string Name => name;
+        public string CollectionName => collectionName;
+        public bool ExactMatch => name == collectionName;
 
-        /// <summary>
-        /// 
-        /// </summary>
+        /// <summary></summary>
         /// <param name="Name">Прилагательное мужского рода в именительном падеже</param>
         /// <param name="CollectionName">Слово найденное в коллекции</param>
         /// <param name="Gender">Пол для склонения</param>
-        /// <param name="rules">Правила склонения</param>
-        public CyrAdjective(string Name, string CollectionName, GendersEnum Gender, CyrRule[] rules)
+        /// <param name="Rules">Правила изменения окончания при склонении прилагательных</param>
+        public CyrAdjective(string Name, string CollectionName, GendersEnum Gender, CyrRule[] Rules)
         {
-            this.name = Name;
-            this.collectionName = CollectionName;
-            this.gender = Gender;
-            this.rules = rules;
-        }
-
-        public string Name
-        {
-            get
-            {
-                return this.name;
-            }
-        }
-
-        public string CollectionName
-        {
-            get
-            {
-                return this.collectionName;
-            }
-        }
-
-        public bool ExactMatch
-        {
-            get
-            {
-                return this.name == this.collectionName;
-            }
-        }
-
-        public GendersEnum Gender
-        {
-            get
-            {
-                return this.gender;
-            }
+            name = Name;
+            collectionName = CollectionName;
+            gender = Gender;
+            rules = Rules;
         }
 
         public CyrResult Decline(AnimatesEnum Animate)
         {
-            CyrResult result;
-
-            if (this.gender == GendersEnum.Feminine)
+            switch (gender)
             {
-                result = new CyrResult(this.rules[5].Apply(this.name),
-                    this.rules[6].Apply(this.name),
-                    this.rules[7].Apply(this.name),
-                    this.rules[8].Apply(this.name),
-                    this.rules[9].Apply(this.name),
-                    this.rules[10].Apply(this.name));
+                case GendersEnum.Feminine:
+                    return new CyrResult(
+                        rules[5].Apply(name),
+                        rules[6].Apply(name),
+                        rules[7].Apply(name),
+                        rules[8].Apply(name),
+                        rules[9].Apply(name),
+                        rules[10].Apply(name)
+                    );
+                case GendersEnum.Neuter:
+                    return new CyrResult(
+                        rules[11].Apply(name),
+                        rules[12].Apply(name),
+                        rules[13].Apply(name),
+                        rules[14].Apply(name),
+                        rules[15].Apply(name),
+                        rules[16].Apply(name)
+                    );
+                default:
+                    return new CyrResult(
+                        name,
+                        rules[0].Apply(name),
+                        rules[1].Apply(name),
+                        Animate == AnimatesEnum.Animated ? rules[2].Apply(name) : name,
+                        rules[3].Apply(name),
+                        rules[4].Apply(name)
+                    );
             }
-            else if (this.gender == GendersEnum.Neuter)
-            {
-                result = new CyrResult(this.rules[11].Apply(this.name),
-                    this.rules[12].Apply(this.name),
-                    this.rules[13].Apply(this.name),
-                    this.rules[14].Apply(this.name),
-                    this.rules[15].Apply(this.name),
-                    this.rules[16].Apply(this.name));
-            }
-            else
-            {
-                result = new CyrResult(this.name,
-                    this.rules[0].Apply(this.name),
-                    this.rules[1].Apply(this.name),
-                    Animate == AnimatesEnum.Animated ? this.rules[2].Apply(this.name) : this.name,
-                    this.rules[3].Apply(this.name),
-                    this.rules[4].Apply(this.name));
-            }
-
-            return result;
         }
 
         public CyrResult DeclinePlural(AnimatesEnum Animate)
         {
-            CyrResult result = new CyrResult(this.rules[17].Apply(this.name),
-                this.rules[18].Apply(this.name),
-                this.rules[19].Apply(this.name),
-                Animate == AnimatesEnum.Animated ? this.rules[21].Apply(this.name) : this.rules[17].Apply(this.name),
-                this.rules[20].Apply(this.name),
-                this.rules[21].Apply(this.name));
-
-            return result;
+            return new CyrResult(
+                rules[17].Apply(name),
+                rules[18].Apply(name),
+                rules[19].Apply(name),
+                Animate == AnimatesEnum.Animated ? rules[21].Apply(name) : rules[17].Apply(name),
+                rules[20].Apply(name),
+                rules[21].Apply(name)
+            );
         }
     }
 }

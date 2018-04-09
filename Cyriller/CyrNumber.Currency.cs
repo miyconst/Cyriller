@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Cyriller.Model;
 
 namespace Cyriller
@@ -23,9 +19,9 @@ namespace Cyriller
         {
             public RurCurrency()
             {
-                this.IntegerGender = GendersEnum.Masculine;
-                this.DecimalGender = GendersEnum.Feminine;
-                this.Decimals = 2;
+                IntegerGender = GendersEnum.Masculine;
+                DecimalGender = GendersEnum.Feminine;
+                Decimals = 2;
             }
 
             public override string[] GetIntegerName(CasesEnum Case)
@@ -75,9 +71,9 @@ namespace Cyriller
         {
             public UsdCurrency()
             {
-                this.IntegerGender = GendersEnum.Masculine;
-                this.DecimalGender = GendersEnum.Masculine;
-                this.Decimals = 2;
+                IntegerGender = GendersEnum.Masculine;
+                DecimalGender = GendersEnum.Masculine;
+                Decimals = 2;
             }
 
             public override string[] GetIntegerName(CasesEnum Case)
@@ -127,9 +123,9 @@ namespace Cyriller
         {
             public EurCurrency()
             {
-                this.IntegerGender = GendersEnum.Neuter;
-                this.DecimalGender = GendersEnum.Masculine;
-                this.Decimals = 2;
+                IntegerGender = GendersEnum.Neuter;
+                DecimalGender = GendersEnum.Masculine;
+                Decimals = 2;
             }
 
             public override string[] GetIntegerName(CasesEnum Case)
@@ -179,9 +175,9 @@ namespace Cyriller
         {
             public YuanCurrency()
             {
-                this.IntegerGender = GendersEnum.Masculine;
-                this.DecimalGender = GendersEnum.Masculine;
-                this.Decimals = 1;
+                IntegerGender = GendersEnum.Masculine;
+                DecimalGender = GendersEnum.Masculine;
+                Decimals = 1;
             }
 
             public override string[] GetIntegerName(CasesEnum Case)

@@ -1,271 +1,215 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
+using System.Linq;
+using System.Collections.Generic;
 using Cyriller.Model;
 
 namespace Cyriller
 {
     public class CyrAdjectiveCollection
     {
-        protected Dictionary<int, string> rules = new Dictionary<int, string>();
-        protected Dictionary<string, string> masculineWords = new Dictionary<string, string>();
-        protected Dictionary<string, KeyValuePair<string, string>> feminineWords = new Dictionary<string, KeyValuePair<string, string>>();
-        protected Dictionary<string, KeyValuePair<string, string>> neuterWords = new Dictionary<string, KeyValuePair<string, string>>();
+        /// <summary>RuleID => Rule</summary>
+        protected Dictionary<int, CyrRule[]> adjectiveRules;
+        /// <summary>Прилагательное мужского рода => RuleID</summary>
+        protected Dictionary<string, KeyValuePair<string, int>> masculineWords;
+        /// <summary>Прилагательное женского рода => Прилагательное мужского рода => RuleID</summary>
+        protected Dictionary<string, KeyValuePair<string, int>> feminineWords;
+        /// <summary>Прилагательное среднего рода => Прилагательное мужского рода => RuleID</summary>
+        protected Dictionary<string, KeyValuePair<string, int>> neuterWords;
 
         public CyrAdjectiveCollection()
         {
-            CyrData data = new CyrData();
-            TextReader treader = data.GetData("adjective-rules.gz");
-            string line;
-            string[] parts;
-
-            line = treader.ReadLine();
-
-            while (line != null)
+            using (TextReader treader = CyrData.GetReader("adjective-rules.gz"))
             {
-                parts = line.Split(' ');
-                rules.Add(int.Parse(parts[0]), parts[1]);
-                line = treader.ReadLine();
+                adjectiveRules = treader.ReadToEnd().Split('\n')
+                    .Select(x => x.Trim().Split(' '))
+                    .ToDictionary(x => int.Parse(x[0]), x => x[1].Split(',', '|').Select(q => new CyrRule(q)).ToArray());
             }
-
-            treader.Dispose();
-            treader = data.GetData("adjectives.gz");
-            line = treader.ReadLine();
-
-            while (line != null)
+            using (TextReader treader = CyrData.GetReader("adjectives.gz"))
             {
-                parts = line.Split(' ');
-
-                if (!masculineWords.ContainsKey(parts[0]))
+                masculineWords = new Dictionary<string, KeyValuePair<string, int>>();
+                foreach (string line in treader.ReadToEnd().Split('\n'))
                 {
-                    masculineWords.Add(parts[0], parts[1]);
+                    string[] parts = line.Trim().ToLower().Split(' ');//прилагательные в нижнем регистре
+                    if (parts.Length != 2 || string.IsNullOrEmpty(parts[0]) || string.IsNullOrEmpty(parts[1]))
+                        continue;
+                    if (masculineWords.ContainsKey(parts[0]))
+                        continue;
+                    masculineWords.Add(parts[0], new KeyValuePair<string, int>(parts[0], int.Parse(parts[1])));
                 }
-
-                line = treader.ReadLine();
             }
-
-            treader.Dispose();
-
-            this.Fill();
+            Fill();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
+        /// <summary>Получение прилагательного с вариантами окончания для разных падежей, числа, рода. Поиск по точному совпадению.</summary>
         /// <param name="Word">Прилагательное</param>
-        /// <param name="DefaultGender">Пол, в котором указано прилагательное, используется при поиске неточных совпадений</param>
-        /// <returns></returns>
-        public CyrAdjective Get(string Word, GendersEnum DefaultGender = GendersEnum.Masculine)
+        /// <param name="Gender">Пол, для которого указано прилагательное</param>
+        public CyrAdjective Get(string Word, GendersEnum Gender = 0)
         {
-            return this.Get(Word, GetConditionsEnum.Strict, DefaultGender);
+            return Get(Word, GetConditionsEnum.Strict, Gender);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
+        /// <summary>Получение прилагательного с вариантами окончания для разных падежей, числа, рода.</summary>
         /// <param name="Word">Прилагательное</param>
-        /// <param name="Condition">Вариант поиска в словаре</param>
-        /// <param name="DefaultGender">Пол, в котором указано прилагательное, используется при поиске неточных совпадений</param>
-        /// <returns></returns>
-        public CyrAdjective Get(string Word, GetConditionsEnum Condition, GendersEnum DefaultGender = GendersEnum.Masculine)
+        /// <param name="Condition">Вариант поиска в словаре (точный или приблизительный)</param>
+        /// <param name="Gender">Пол, в котором указано прилагательное, используется при поиске неточных совпадений</param>
+        public CyrAdjective Get(string Word, GetConditionsEnum Condition, GendersEnum Gender = 0)
         {
-            GendersEnum gender = GendersEnum.Masculine;
-            string t = Word;
-            string details = this.GetStrictDetails(ref t, ref gender);
+            Word = (Word ?? string.Empty).Trim();
+            if (string.IsNullOrEmpty(Word))
+                throw new ArgumentException("Empty Word");
 
-            if (details.IsNullOrEmpty() && Condition == GetConditionsEnum.Similar)
-            {
-                details = this.GetSimilarDetails(Word, DefaultGender, ref gender, out t);
-            }
+            string FoundWord = string.Empty;
+            string LowerWord = Word.ToLower();
+            KeyValuePair<string, int> details = GetStrictDetails(ref LowerWord, ref Gender);
+            if (!string.IsNullOrEmpty(details.Key))
+                FoundWord = LowerWord;
+            else if (Condition == GetConditionsEnum.Similar)
+                details = GetSimilarDetails(LowerWord, Gender, ref Gender, out FoundWord);
 
-            if (details.IsNullOrEmpty())
-            {
+            if (string.IsNullOrEmpty(details.Key))
                 throw new CyrWordNotFoundException(Word);
-            }
 
-            int ruleID = int.Parse(details);
-            string[] parts = this.rules[ruleID].Split(',');
-
-            CyrRule[] rules = parts.Select(val => new CyrRule(val)).ToArray();
-
-            if (gender == GendersEnum.Feminine)
+            CyrRule[] rule = adjectiveRules[details.Value];
+            switch (Gender)
             {
-                Word = rules[22].Apply(Word);
-            }
-            else if(gender == GendersEnum.Neuter)
-            {
-                Word = rules[23].Apply(Word);
+                case GendersEnum.Feminine:
+                    Word = rule[(int)RuleAdjectiveEnum.FromFeminine].Apply(Word);
+                    break;
+                case GendersEnum.Neuter:
+                    Word = rule[(int)RuleAdjectiveEnum.FromNeuter].Apply(Word);
+                    break;
+                default:
+                    Gender = GendersEnum.Masculine;
+                    break;
             }
 
-            CyrAdjective adj = new CyrAdjective(Word, t, gender, rules);
-
-            return adj;
+            return new CyrAdjective(Word, FoundWord, Gender, rule);
         }
 
-        protected string GetStrictDetails(ref string Word, ref GendersEnum Gender)
+        /// <summary>Поиск ID правила по точному совпадению по всем словарям. Сначала мужской, потом женский, потом средний.</summary>
+        /// <param name="Word">Прилагательное</param>
+        /// <param name="Gender">Пол, в котором указано прилагательное</param>
+        protected KeyValuePair<string, int> GetStrictDetails(ref string Word, ref GendersEnum Gender)
         {
-            string details = this.GetDictionaryItem(Word, this.masculineWords);
-
-            if (details.IsNullOrEmpty())
+            KeyValuePair<string, int> details = default(KeyValuePair<string, int>);
+            switch (Gender)
             {
-                KeyValuePair<string, string> f = this.GetDictionaryItem(Word, this.feminineWords);
+                case GendersEnum.Feminine:
+                    details = CyrData.GetDictionaryItem(Word, feminineWords);
+                    if (details.Key.IsNotNullOrEmpty())
+                    {
+                        Gender = GendersEnum.Feminine;
+                        Word = details.Key;
+                        return details;
+                    }
+                    break;
+                case GendersEnum.Neuter:
+                    details = CyrData.GetDictionaryItem(Word, neuterWords);
+                    if (details.Key.IsNotNullOrEmpty())
+                    {
+                        Gender = GendersEnum.Neuter;
+                        Word = details.Key;
+                        return details;
+                    }
+                    break;
 
-                if (f.Key.IsNotNullOrEmpty())
-                {
-                    Word = f.Key;
-                    details = f.Value;
-                    Gender = GendersEnum.Feminine;
-                }
             }
 
-            if (details.IsNullOrEmpty())
+            details = CyrData.GetDictionaryItem(Word, masculineWords);
+            if (!string.IsNullOrEmpty(details.Key))
             {
-                KeyValuePair<string, string> f = this.GetDictionaryItem(Word, this.neuterWords);
+                Gender = GendersEnum.Masculine;
+                Word = details.Key;
+                return details;
+            }
 
-                if (f.Key.IsNotNullOrEmpty())
+            if (Gender == 0)
+            {
+                details = CyrData.GetDictionaryItem(Word, feminineWords);
+                if (details.Key.IsNotNullOrEmpty())
                 {
-                    Word = f.Key;
-                    details = f.Value;
+                    Gender = GendersEnum.Feminine;
+                    Word = details.Key;
+                    return details;
+                }
+
+                details = CyrData.GetDictionaryItem(Word, neuterWords);
+                if (details.Key.IsNotNullOrEmpty())
+                {
                     Gender = GendersEnum.Neuter;
+                    Word = details.Key;
+                    return details;
                 }
             }
 
             return details;
         }
 
-        protected string GetSimilarDetails(string Word, GendersEnum DefaultGender, ref GendersEnum Gender, out string FoundWord)
+        /// <summary>Поиск пары (прилагательное мужского рода => ID правила) по неточному совпадению по словарям</summary>
+        /// <param name="Word">Искомое слово</param>
+        /// <param name="DefaultGender">Если 0, то ищем в мужском, потом в женском, потом в среднем. Если нет, то в соответствующем, потом в мужском.</param>
+        /// <param name="Gender">Род, для которого нашлось совпадение</param>
+        /// <param name="FoundWord">Слово, которое по окончанию подходит к искомому слову</param>
+        protected KeyValuePair<string, int> GetSimilarDetails(string Word, GendersEnum DefaultGender, ref GendersEnum Gender, out string FoundWord)
         {
-            string similar = Word;
-            KeyValuePair<string, string> v;
+            FoundWord = string.Empty;
+            KeyValuePair<string, int> details = default(KeyValuePair<string, int>);
 
             switch (DefaultGender)
             {
                 case GendersEnum.Feminine:
-                    v = this.GetSimilarDetails(Word, this.feminineWords, out FoundWord);
-                    similar = v.Key;
+                    details = CyrData.GetSimilarDetails(Word, feminineWords, out FoundWord);
                     Gender = GendersEnum.Feminine;
                     break;
                 case GendersEnum.Neuter:
-                    v = this.GetSimilarDetails(Word, this.neuterWords, out FoundWord);
-                    similar = v.Key;
+                    details = CyrData.GetSimilarDetails(Word, neuterWords, out FoundWord);
                     Gender = GendersEnum.Neuter;
                     break;
             }
+            if (!string.IsNullOrEmpty(details.Key))
+                return details;
 
-            string details = this.GetSimilarDetails(similar, this.masculineWords, out FoundWord);
-
-            if (details.IsNullOrEmpty() && DefaultGender == 0)
+            details = CyrData.GetSimilarDetails(Word, masculineWords, out FoundWord);
+            if (!string.IsNullOrEmpty(details.Key))
             {
-                v = this.GetSimilarDetails(Word, this.feminineWords, out FoundWord);
-                similar = v.Key;
-                Gender = GendersEnum.Feminine;
-                details = this.GetSimilarDetails(similar, this.masculineWords, out FoundWord);
+                Gender = GendersEnum.Masculine;
+                return details;
             }
 
-            if (details.IsNullOrEmpty() && DefaultGender == 0)
+            if (DefaultGender == 0)
             {
-                v = this.GetSimilarDetails(Word, this.neuterWords, out FoundWord);
-                similar = v.Key;
-                Gender = GendersEnum.Neuter;
-                details = this.GetSimilarDetails(similar, this.masculineWords, out FoundWord);
-            }
-
-            return details;
-        }
-
-        protected T GetDictionaryItem<T>(string Key, Dictionary<string, T> Items)
-        {
-            string t = Key;
-            T details = this.GetDetails(t, Items);
-
-            if (details == null)
-            {
-                t = Key.ToLower();
-                details = this.GetDetails(t, Items);
-            }
-
-            if (details == null)
-            {
-                t = Key.ToLower().UppercaseFirst();
-                details = this.GetDetails(t, Items);
-            }
-
-            if (details == null)
-            {
-                List<int> indexes = new List<int>();
-                string lower = Key.ToLower();
-
-                for (int i = 0; i < lower.Length; i++)
+                details = CyrData.GetSimilarDetails(Word, feminineWords, out FoundWord);
+                if (!string.IsNullOrEmpty(details.Key))
                 {
-                    if (lower[i] == 'е')
-                    {
-                        indexes.Add(i);
-                    }
+                    Gender = GendersEnum.Feminine;
+                    return details;
                 }
 
-                foreach (int index in indexes)
+                details = CyrData.GetSimilarDetails(Word, neuterWords, out FoundWord);
+                if (!string.IsNullOrEmpty(details.Key))
                 {
-                    t = lower.Substring(0, index) + "ё" + lower.Substring(index + 1);
-                    details = this.GetDetails(t, Items);
-
-                    if (details != null)
-                    {
-                        break;
-                    }
+                    Gender = GendersEnum.Neuter;
+                    return details;
                 }
             }
 
             return details;
-        }
-
-        protected T GetSimilarDetails<T>(string Word, Dictionary<string, T> Collection, out string CollectionWord)
-        {
-            CyrData data = new CyrData();
-
-            CollectionWord = data.GetSimilar(Word, Collection.Keys.ToList());
-
-            if (CollectionWord.IsNullOrEmpty())
-            {
-                return default(T);
-            }
-
-            return this.GetDetails(CollectionWord, Collection);
-        }
-
-        protected T GetDetails<T>(string Word, Dictionary<string, T> Collection)
-        {
-            if (Collection.ContainsKey(Word))
-            {
-                return Collection[Word];
-            }
-
-            return default(T);
         }
 
         protected void Fill()
         {
-            foreach (KeyValuePair<string, string> item in this.masculineWords)
+            feminineWords = new Dictionary<string, KeyValuePair<string, int>>();
+            neuterWords = new Dictionary<string, KeyValuePair<string, int>>();
+            foreach (KeyValuePair<string, int> item in masculineWords.Values)
             {
-                string rules = this.rules[int.Parse(item.Value)];
-                string[] parts = rules.Split(',');
-                CyrRule rule = new CyrRule(parts[5]);
-                string w = rule.Apply(item.Key);
+                string w = adjectiveRules[item.Value][(int)RuleAdjectiveEnum.FeminineNominative].Apply(item.Key);
+                if (!string.IsNullOrEmpty(w) && !feminineWords.ContainsKey(w))
+                    feminineWords.Add(w, item);
 
-                if (!this.feminineWords.ContainsKey(w))
-                {
-                    this.feminineWords.Add(w, item);
-                }
-
-                rule = new CyrRule(parts[11]);
-                w = rule.Apply(item.Key);
-
-                if (!this.neuterWords.ContainsKey(w))
-                {
-                    this.neuterWords.Add(w, item);
-                }
+                w = adjectiveRules[item.Value][(int)RuleAdjectiveEnum.NeuterNominative].Apply(item.Key);
+                if (!string.IsNullOrEmpty(w) && !neuterWords.ContainsKey(w))
+                    neuterWords.Add(w, item);
             }
         }
     }

@@ -1,57 +1,38 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Text.RegularExpressions;
 
 namespace Cyriller
 {
     public class CyrRule
     {
+        /// <summary>Применяемое окончание</summary>
         protected string end;
+        /// <summary>Количество заменяемых символов в конце слова</summary>
         protected int cut;
 
+        /// <summary>Правило для применения окончания</summary>
+        /// <param name="Rule">Строка, включающая в себя применяемое окончание и количество заменяемых символов в конце слова</param>
         public CyrRule(string Rule)
         {
-            if (string.IsNullOrEmpty(Rule))
+            Rule = (Rule ?? string.Empty).Trim();
+            int pos = -1;
+            while (++pos < Rule.Length)
             {
-                this.end = string.Empty;
-                this.cut = 0;
-                return;
+                if (Char.IsDigit(Rule[pos]))
+                    break;
             }
 
-            Regex reg = new Regex(@"\d", RegexOptions.IgnoreCase);
-            string temp;
-
-            this.end = reg.Replace(Rule, string.Empty);
-
-            if (this.end.Length > 0)
-            {
-                temp = Rule.Replace(this.end, string.Empty);
-            }
-            else
-            {
-                temp = Rule;
-            }
-
-            if (temp.IsNullOrEmpty())
-            {
-                this.cut = 0;
-            }
-            else
-            {
-                this.cut = int.Parse(temp);
-            }
+            end = Rule.Substring(0, pos);
+            int.TryParse(Rule.Substring(pos), out cut);
         }
 
+        /// <summary>Применение правила замены окончания к заданному слову</summary>
+        /// <param name="Name">Слово, к которому применяется правило замены окончания</param>
         public string Apply(string Name)
         {
-            if (this.end == "*")
-            {
+            if (end == "*")
                 return string.Empty;
-            }
-
+            if (Name.Length <= cut)
+                return string.Empty;
             return Name.Substring(0, Name.Length - cut) + end;
         }
     }

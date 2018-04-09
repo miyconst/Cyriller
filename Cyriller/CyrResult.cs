@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Cyriller.Model;
 
 namespace Cyriller
@@ -16,171 +13,99 @@ namespace Cyriller
         protected string case5;
         protected string case6;
 
-        public CyrResult()
-        {
-        }
+        public CyrResult() { }
 
         public CyrResult(string Word)
         {
-            this.case1 = Word;
-            this.case2 = Word;
-            this.case3 = Word;
-            this.case4 = Word;
-            this.case5 = Word;
-            this.case6 = Word;
+            case1 = Word;
+            case2 = Word;
+            case3 = Word;
+            case4 = Word;
+            case5 = Word;
+            case6 = Word;
         }
 
         public CyrResult(string Case1, string Case2, string Case3, string Case4, string Case5, string Case6)
         {
-            this.case1 = Case1;
-            this.case2 = Case2;
-            this.case3 = Case3;
-            this.case4 = Case4;
-            this.case5 = Case5;
-            this.case6 = Case6;
+            case1 = Case1;
+            case2 = Case2;
+            case3 = Case3;
+            case4 = Case4;
+            case5 = Case5;
+            case6 = Case6;
         }
 
         public static CyrResult operator +(CyrResult A, CyrResult B)
         {
-            return new CyrResult(A.case1 + " " + B.case1,
+            return new CyrResult(
+                A.case1 + " " + B.case1,
                 A.case2 + " " + B.case2,
                 A.case3 + " " + B.case3,
                 A.case4 + " " + B.case4,
                 A.case5 + " " + B.case5,
-                A.case6 + " " + B.case6);
+                A.case6 + " " + B.case6
+            );
         }
 
         /// <summary>
         /// Именительный, Кто? Что? (есть)
         /// </summary>
-        public string Nominative
-        {
-            get
-            {
-                return this.case1;
-            }
-        }
+        public string Nominative => case1;
 
         /// <summary>
         /// Родительный, Кого? Чего? (нет)
         /// </summary>
-        public string Genitive
-        {
-            get
-            {
-                return this.case2;
-            }
-        }
+        public string Genitive => case2;
 
         /// <summary>
         /// Дательный, Кому? Чему? (дам)
         /// </summary>
-        public string Dative
-        {
-            get 
-            {
-                return this.case3;
-            }
-        }
+        public string Dative => case3;
 
         /// <summary>
         /// Винительный, Кого? Что? (вижу)
         /// </summary>
-        public string Accusative
-        {
-            get
-            {
-                return this.case4;
-            }
-        }
+        public string Accusative => case4;
 
         /// <summary>
         /// Творительный, Кем? Чем? (горжусь)
         /// </summary>
-        public string Instrumental
-        {
-            get 
-            {
-                return this.case5;
-            }
-        }
+        public string Instrumental => case5;
 
         /// <summary>
         /// Предложный, О ком? О чем? (думаю)
         /// </summary>
-        public string Prepositional
-        {
-            get
-            {
-                return this.case6;
-            }
-        }
+        public string Prepositional => case6;
 
         /// <summary>
         /// Именительный, Кто? Что? (есть)
         /// </summary>
-        public string Именительный
-        {
-            get
-            {
-                return this.case1;
-            }
-        }
+        public string Именительный => case1;
 
         /// <summary>
         /// Родительный, Кого? Чего? (нет)
         /// </summary>
-        public string Родительный
-        {
-            get
-            {
-                return this.case2;
-            }
-        }
+        public string Родительный => case2;
 
         /// <summary>
         /// Дательный, Кому? Чему? (дам)
         /// </summary>
-        public string Дательный
-        {
-            get
-            {
-                return this.case3;
-            }
-        }
+        public string Дательный => case3;
 
         /// <summary>
         /// Винительный, Кого? Что? (вижу)
         /// </summary>
-        public string Винительный
-        {
-            get
-            {
-                return this.case4;
-            }
-        }
+        public string Винительный => case4;
 
         /// <summary>
         /// Творительный, Кем? Чем? (горжусь)
         /// </summary>
-        public string Творительный
-        {
-            get
-            {
-                return this.case5;
-            }
-        }
+        public string Творительный => case5;
 
         /// <summary>
         /// Предложный, О ком? О чем? (думаю)
         /// </summary>
-        public string Предложный
-        {
-            get
-            {
-                return this.case6;
-            }
-        }
+        public string Предложный => case6;
 
         public string Get(CasesEnum Case)
         {
@@ -212,12 +137,12 @@ namespace Cyriller
 
         public void Add(CyrResult Result, string Separator = "-")
         {
-            this.case1 += Separator + Result.case1;
-            this.case2 += Separator + Result.case2;
-            this.case3 += Separator + Result.case3;
-            this.case4 += Separator + Result.case4;
-            this.case5 += Separator + Result.case5;
-            this.case6 += Separator + Result.case6;
+            case1 += Separator + Result.case1;
+            case2 += Separator + Result.case2;
+            case3 += Separator + Result.case3;
+            case4 += Separator + Result.case4;
+            case5 += Separator + Result.case5;
+            case6 += Separator + Result.case6;
         }
 
         public List<string> ToList()
@@ -232,47 +157,38 @@ namespace Cyriller
 
         public Dictionary<CasesEnum, string> ToDictionary()
         {
-            CasesEnum[] caseNames = new CasesEnum[] { CasesEnum.Nominative, CasesEnum.Genitive, CasesEnum.Dative, CasesEnum.Accusative, CasesEnum.Instrumental, CasesEnum.Prepositional };
-            Dictionary<CasesEnum, string> result = new Dictionary<CasesEnum, string>();
-
-            result.Add(caseNames[0], case1);
-            result.Add(caseNames[1], case2);
-            result.Add(caseNames[2], case3);
-            result.Add(caseNames[3], case4);
-            result.Add(caseNames[4], case5);
-            result.Add(caseNames[5], case6);
-
-            return result;
+            return new Dictionary<CasesEnum, string> {
+                { CasesEnum.Nominative, case1 },
+                { CasesEnum.Genitive, case2 },
+                { CasesEnum.Dative, case3 },
+                { CasesEnum.Accusative, case4 },
+                { CasesEnum.Instrumental, case5 },
+                { CasesEnum.Prepositional, case6 },
+            };
         }
 
         public Dictionary<string, string> ToStringDictionary()
         {
-            string[] caseNames = new string[] { "Nominative", "Genitive", "Dative", "Accusative", "Instrumental", "Prepositional" };
-            Dictionary<string, string> result = new Dictionary<string, string>();
-
-            result.Add(caseNames[0], case1);
-            result.Add(caseNames[1], case2);
-            result.Add(caseNames[2], case3);
-            result.Add(caseNames[3], case4);
-            result.Add(caseNames[4], case5);
-            result.Add(caseNames[5], case6);
-
-            return result;
+            return new Dictionary<string, string> {
+                { CasesEnum.Nominative.ToString(), case1 },
+                { CasesEnum.Genitive.ToString(), case2 },
+                { CasesEnum.Dative.ToString(), case3 },
+                { CasesEnum.Accusative.ToString(), case4 },
+                { CasesEnum.Instrumental.ToString(), case5 },
+                { CasesEnum.Prepositional.ToString(), case6 },
+            };
         }
 
         public Dictionary<string, string> ToRussianStringDictionary()
         {
-            string[] caseNames = new string[] { "Именительный", "Родительный", "Дательный", "Винительный", "Творительный", "Предложный" };
-            Dictionary<string, string> result = new Dictionary<string, string>();
-
-            result.Add(caseNames[0], case1);
-            result.Add(caseNames[1], case2);
-            result.Add(caseNames[2], case3);
-            result.Add(caseNames[3], case4);
-            result.Add(caseNames[4], case5);
-            result.Add(caseNames[5], case6);
-
-            return result;
+            return new Dictionary<string, string> {
+                { "Именительный", case1 },
+                { "Родительный", case2 },
+                { "Дательный", case3 },
+                { "Винительный", case4 },
+                { "Творительный", case5 },
+                { "Предложный", case6 },
+            };
         }
 
         /// <summary>
@@ -284,13 +200,13 @@ namespace Cyriller
         {
             get
             {
-                this.CheckIndex(Index);
-                return this.Get((CasesEnum)Index);
+                CheckIndex(Index);
+                return Get((CasesEnum)Index);
             }
             set
             {
-                this.CheckIndex(Index);
-                this.Set((CasesEnum)Index, value);
+                CheckIndex(Index);
+                Set((CasesEnum)Index, value);
             }
         }
 

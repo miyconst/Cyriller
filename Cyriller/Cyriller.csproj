@@ -59,6 +59,8 @@
     <Compile Include="Model\GendersEnum.cs" />
     <Compile Include="Model\GetConditionsEnum.cs" />
     <Compile Include="Model\NumbersEnum.cs" />
+    <Compile Include="Model\RuleAdjectiveEnum.cs" />
+    <Compile Include="Model\RuleNounEnum.cs" />
     <Compile Include="Model\SpeechPartsEnum.cs" />
     <Compile Include="Model\WordTypesEnum.cs" />
     <Compile Include="CyrNounCollection.cs" />

@@ -2,59 +2,27 @@
 {
     public enum SpeechPartsEnum
     {
-        /// <summary>
-        /// Существительное
-        /// </summary>
+        /// <summary>Существительное</summary>
         Noun = 1,
-
-        /// <summary>
-        /// Прилагательное
-        /// </summary>
+        /// <summary>Прилагательное</summary>
         Adjective = 2,
-
-        /// <summary>
-        /// Числительное
-        /// </summary>
+        /// <summary>Числительное</summary>
         Numeral = 3,
-
-        /// <summary>
-        /// Местоимение
-        /// </summary>
+        /// <summary>Местоимение</summary>
         Pronoun = 4,
-
-        /// <summary>
-        /// Глагол
-        /// </summary>
+        /// <summary>Глагол</summary>
         Verb = 5,
-
-        /// <summary>
-        /// Наречие
-        /// </summary>
+        /// <summary>Наречие</summary>
         Adverb = 6,
-
-        /// <summary>
-        /// Предлог
-        /// </summary>
+        /// <summary>Предлог</summary>
         Preposition = 7,
-
-        /// <summary>
-        /// Союз
-        /// </summary>
+        /// <summary>Союз</summary>
         Conjunction = 8,
-
-        /// <summary>
-        /// Частица
-        /// </summary>
+        /// <summary>Частица</summary>
         Particle = 9,
-
-        /// <summary>
-        /// Связка
-        /// </summary>
+        /// <summary>Связка</summary>
         Copula = 10,
-
-        /// <summary>
-        /// Междометие
-        /// </summary>
+        /// <summary>Междометие</summary>
         Interjection = 11
     }
 }
