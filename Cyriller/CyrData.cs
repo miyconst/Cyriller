@@ -9,7 +9,7 @@ using System.Collections.Concurrent;
 
 namespace Cyriller
 {
-    internal static class CyrData
+    internal class CyrData
     {
         public static TextReader GetData(string FileName)
         {
@@ -35,10 +35,12 @@ namespace Cyriller
         private static string GetSimilar(string Word, IEnumerable<string> Collection, string OriginalWord)
         {
             if (Word == null || Word.Length <= 1)
+            {
                 return Word;
+            }
 
-            string foundWord = string.Empty;
-            // SimilarWord => [Length, QtySameChars]
+            string foundWord = null;
+            // SimilarWord => [lengthSimilarWord, quantitySameChars]
             ConcurrentDictionary<string, int[]> keys = new ConcurrentDictionary<string, int[]>();
             Parallel.ForEach(Collection, (s, loopState) =>
             {
@@ -50,23 +52,29 @@ namespace Cyriller
                         loopState.Stop();
                     }
 
-                    int QtySameChars = 0;
-                    for (int i = OriginalWord.Length < s.Length ? OriginalWord.Length : s.Length; i > Word.Length; i--)
+                    int quantitySameChars = 0;
+                    for (int i = Math.Min(OriginalWord.Length, s.Length); i > Word.Length; i--)
                     {
                         if (s[s.Length - i] == OriginalWord[OriginalWord.Length - i])
-                            QtySameChars++;
+                        {
+                            quantitySameChars++;
+                        }
                     }
-                    keys.TryAdd(s, new int[] { s.Length, QtySameChars });
+                    keys.TryAdd(s, new int[] { s.Length, quantitySameChars });
                 }
             });
 
-            if (foundWord.Length > 0)
+            if (!string.IsNullOrEmpty(foundWord))
+            {
                 return foundWord;
+            }
 
             if (keys.Count == 0 && Word.Length > 2)
+            {
                 return GetSimilar(Word.Substring(1), Collection, OriginalWord);
+            }
 
-            return keys.OrderBy(val => val.Value[0]).OrderByDescending(val => val.Value[1]).FirstOrDefault().Key;
+            return keys.OrderBy(val => val.Value[0]).ThenByDescending(val => val.Value[1]).FirstOrDefault().Key;
         }
     }
 }
