@@ -34,7 +34,9 @@ namespace Cyriller
         /// <param name="OriginalWord">Изначальное искомое слово получения весового коэффициента при поиске подходящих слов</param>
         private static string GetSimilar(string Word, IEnumerable<string> Collection, string OriginalWord)
         {
-            if (Word == null || Word.Length <= 1)
+            int wordLength1 = 1;
+            int wordLength2 = 2;
+            if (Word == null || Word.Length <= wordLength1)
             {
                 return Word;
             }
@@ -69,7 +71,7 @@ namespace Cyriller
                 return foundWord;
             }
 
-            if (keys.Count == 0 && Word.Length > 2)
+            if (keys.IsEmpty && Word.Length > wordLength2)
             {
                 return GetSimilar(Word.Substring(1), Collection, OriginalWord);
             }
