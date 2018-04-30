@@ -37,37 +37,42 @@ namespace Cyriller
 
             string foundWord = null;
             int wordLength = Word.Length;
-            // SimilarWord => [lengthSimilarWord, quantitySameChars]
-            ConcurrentDictionary<string, int[]> keys = new ConcurrentDictionary<string, int[]>();
-            Parallel.ForEach(Collection, (s, loopState) =>
+            int equalWeight = char.MaxValue;
+            // SimilarWord => [lengthSimilarWord, similarWeight]
+            ConcurrentDictionary<string, decimal[]> keys = new ConcurrentDictionary<string, decimal[]>();
+            Parallel.ForEach(Collection, (str, loopState) =>
             {
-                if (s != Word)
+                if (str == Word)
                 {
-                    int sLength = s.Length;
-                    int minLength = Math.Min(wordLength, sLength);
-                    int quantitySameChars = 0;
-                    bool isSimilar = true;
-                    for (int i = 1; i <= minLength; i++)
-                    {
-                        if (s[sLength - i] == Word[wordLength - i])
-                        {
-                            quantitySameChars++;
-                        }
-                        if (i <= MinWordLength && quantitySameChars < i)
-                        {
-                            isSimilar = false;
-                            break;
-                        }
-                    }
-                    if (isSimilar)
-                    {
-                        keys.TryAdd(s, new int[] { s.Length, quantitySameChars });
-                    }
+                    foundWord = str;
+                    loopState.Stop();
                 }
                 else
                 {
-                    foundWord = s;
-                    loopState.Stop();
+                    int strLength = str.Length;
+                    int minLength = Math.Min(wordLength, strLength);
+                    bool isSimilar = true;
+                    decimal similarWeight = 0;
+                    int positionMultiply;
+                    for (int i = 1; i <= minLength; i++)
+                    {
+                        positionMultiply = minLength - i + 1;
+                        if (str[strLength - i] != Word[wordLength - i])
+                        {
+                            if (i <= MinWordLength)
+                            {
+                                isSimilar = false;
+                                break;
+                            }
+
+                            positionMultiply--;
+                        }
+                        similarWeight += positionMultiply * equalWeight;
+                    }
+                    if (isSimilar)
+                    {
+                        keys.TryAdd(str, new decimal[] { str.Length, similarWeight });
+                    }
                 }
             });
 
@@ -76,7 +81,7 @@ namespace Cyriller
                 return foundWord;
             }
 
-            return keys.OrderBy(val => val.Value[0]).ThenByDescending(val => val.Value[1]).FirstOrDefault().Key;
+            return keys.OrderByDescending(val => val.Value[1]).ThenBy(x => x.Value[0]).ThenBy(x => x.Key).FirstOrDefault().Key;
         }
     }
 }
