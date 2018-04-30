@@ -27,56 +27,53 @@ namespace Cyriller
         /// <summary>Нахождение подходящего по окончанию слова в коллекции</summary>
         /// <param name="Word">Искомое слово</param>
         /// <param name="Collection">Список слов для поиска</param>
-        public string GetSimilar(string Word, IEnumerable<string> Collection)
+        /// <param name="MinWordLength">Минимальная длина окончания слова, которая позволяет различать слова</param>
+        public string GetSimilar(string Word, IEnumerable<string> Collection, int MinWordLength = 2)
         {
-            return GetSimilar(Word, Collection, Word);
-        }
-
-        /// <summary>Нахождение подходящего по окончанию слова в коллекции</summary>
-        /// <param name="Word">Искомое слово</param>
-        /// <param name="Collection">Список слов для поиска</param>
-        /// <param name="OriginalWord">Изначальное искомое слово получения весового коэффициента при поиске подходящих слов</param>
-        private string GetSimilar(string Word, IEnumerable<string> Collection, string OriginalWord)
-        {
-            int minWordLength = 2;
-            if (Word == null || Word.Length < minWordLength)
+            if (Word == null || Word.Length < MinWordLength)
             {
                 return Word;
             }
 
             string foundWord = null;
+            int wordLength = Word.Length;
             // SimilarWord => [lengthSimilarWord, quantitySameChars]
             ConcurrentDictionary<string, int[]> keys = new ConcurrentDictionary<string, int[]>();
             Parallel.ForEach(Collection, (s, loopState) =>
             {
-                if (s.EndsWith(Word))
+                if (s != Word)
                 {
-                    if (s == Word)
-                    {
-                        foundWord = s;
-                        loopState.Stop();
-                    }
-
+                    int sLength = s.Length;
+                    int minLength = Math.Min(wordLength, sLength);
                     int quantitySameChars = 0;
-                    for (int i = Math.Min(OriginalWord.Length, s.Length); i > Word.Length; i--)
+                    bool isSimilar = true;
+                    for (int i = 1; i <= minLength; i++)
                     {
-                        if (s[s.Length - i] == OriginalWord[OriginalWord.Length - i])
+                        if (s[sLength - i] == Word[wordLength - i])
                         {
                             quantitySameChars++;
                         }
+                        if (i <= MinWordLength && quantitySameChars < i)
+                        {
+                            isSimilar = false;
+                            break;
+                        }
                     }
-                    keys.TryAdd(s, new int[] { s.Length, quantitySameChars });
+                    if (isSimilar)
+                    {
+                        keys.TryAdd(s, new int[] { s.Length, quantitySameChars });
+                    }
+                }
+                else
+                {
+                    foundWord = s;
+                    loopState.Stop();
                 }
             });
 
             if (!string.IsNullOrEmpty(foundWord))
             {
                 return foundWord;
-            }
-
-            if (keys.IsEmpty && Word.Length > minWordLength)
-            {
-                return GetSimilar(Word.Substring(1), Collection, OriginalWord);
             }
 
             return keys.OrderBy(val => val.Value[0]).ThenByDescending(val => val.Value[1]).FirstOrDefault().Key;
