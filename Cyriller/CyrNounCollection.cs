@@ -16,7 +16,8 @@ namespace Cyriller
 
         public CyrNounCollection()
         {
-            TextReader treader = CyrData.GetData("noun-rules.gz");
+            CyrData data = new CyrData();
+            TextReader treader = data.GetData("noun-rules.gz");
             string line;
             string[] parts;
 
@@ -30,7 +31,7 @@ namespace Cyriller
             }
 
             treader.Dispose();
-            treader = CyrData.GetData("nouns.gz");
+            treader = data.GetData("nouns.gz");
             line = treader.ReadLine();
 
             while (line != null)
@@ -147,7 +148,9 @@ namespace Cyriller
 
         protected List<string> GetSimilarDetails(string Word, out string CollectionWord)
         {
-            CollectionWord = CyrData.GetSimilar(Word, words.Keys.ToList());
+            CyrData data = new CyrData();
+
+            CollectionWord = data.GetSimilar(Word, words.Keys.ToList());
 
             if (CollectionWord.IsNullOrEmpty())
             {

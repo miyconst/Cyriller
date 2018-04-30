@@ -17,7 +17,8 @@ namespace Cyriller
 
         public CyrAdjectiveCollection()
         {
-            TextReader treader = CyrData.GetData("adjective-rules.gz");
+            CyrData data = new CyrData();
+            TextReader treader = data.GetData("adjective-rules.gz");
             string line;
             string[] parts;
 
@@ -31,7 +32,7 @@ namespace Cyriller
             }
 
             treader.Dispose();
-            treader = CyrData.GetData("adjectives.gz");
+            treader = data.GetData("adjectives.gz");
             line = treader.ReadLine();
 
             while (line != null)
@@ -222,7 +223,9 @@ namespace Cyriller
 
         protected T GetSimilarDetails<T>(string Word, Dictionary<string, T> Collection, out string CollectionWord)
         {
-            CollectionWord = CyrData.GetSimilar(Word, Collection.Keys.ToList());
+            CyrData data = new CyrData();
+
+            CollectionWord = data.GetSimilar(Word, Collection.Keys.ToList());
 
             if (CollectionWord.IsNullOrEmpty())
             {

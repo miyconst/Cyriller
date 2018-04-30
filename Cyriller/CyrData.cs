@@ -11,7 +11,11 @@ namespace Cyriller
 {
     internal class CyrData
     {
-        public static TextReader GetData(string FileName)
+        public CyrData()
+        {
+        }
+
+        public TextReader GetData(string FileName)
         {
             Stream stream = typeof(CyrData).Assembly.GetManifestResourceStream("Cyriller.App_Data." + FileName);
             GZipStream gzip = new GZipStream(stream, CompressionMode.Decompress);
@@ -23,7 +27,7 @@ namespace Cyriller
         /// <summary>Нахождение подходящего по окончанию слова в коллекции</summary>
         /// <param name="Word">Искомое слово</param>
         /// <param name="Collection">Список слов для поиска</param>
-        public static string GetSimilar(string Word, IEnumerable<string> Collection)
+        public string GetSimilar(string Word, IEnumerable<string> Collection)
         {
             return GetSimilar(Word, Collection, Word);
         }
@@ -32,7 +36,7 @@ namespace Cyriller
         /// <param name="Word">Искомое слово</param>
         /// <param name="Collection">Список слов для поиска</param>
         /// <param name="OriginalWord">Изначальное искомое слово получения весового коэффициента при поиске подходящих слов</param>
-        private static string GetSimilar(string Word, IEnumerable<string> Collection, string OriginalWord)
+        private string GetSimilar(string Word, IEnumerable<string> Collection, string OriginalWord)
         {
             int minWordLength = 2;
             if (Word == null || Word.Length < minWordLength)
