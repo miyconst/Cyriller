@@ -149,7 +149,7 @@ namespace Cyriller
         protected List<string> GetSimilarDetails(string Word, out string CollectionWord)
         {
             CyrData data = new CyrData();
-            
+
             CollectionWord = data.GetSimilar(Word, words.Keys.ToList());
 
             if (CollectionWord.IsNullOrEmpty())
