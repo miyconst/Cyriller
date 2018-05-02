@@ -76,7 +76,7 @@ namespace Cyriller
                 }
             });
 
-            if (!string.IsNullOrEmpty(foundWord))
+            if (!string.IsNullOrEmpty(foundWord) || !keys.Any())
             {
                 return foundWord;
             }
