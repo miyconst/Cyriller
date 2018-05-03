@@ -46,9 +46,9 @@ namespace Cyriller
             string foundWord = null;
             int wordLength = Word.Length;
             int superLength = 10;
-            decimal superMultiply = 100;
+            int superMultiply = 100;
             // SimilarWord => [lengthSimilarWord, similarWeight]
-            ConcurrentDictionary<string, decimal[]> keys = new ConcurrentDictionary<string, decimal[]>();
+            ConcurrentDictionary<string, int[]> keys = new ConcurrentDictionary<string, int[]>();
             Parallel.ForEach(Collection, (str, loopState) =>
             {
                 if (str == Word)
@@ -61,8 +61,8 @@ namespace Cyriller
                     int strLength = str.Length;
                     int minLength = Math.Min(wordLength, strLength);
                     bool isSimilar = true;
-                    decimal similarWeight = 0;
-                    decimal positionWeight = 0;
+                    int similarWeight = 0;
+                    int positionWeight = 0;
                     for (int i = 1; i <= minLength; i++)
                     {
                         if (str[strLength - i] == Word[wordLength - i])
@@ -89,17 +89,34 @@ namespace Cyriller
                     }
                     if (isSimilar)
                     {
-                        keys.TryAdd(str, new decimal[] { str.Length, similarWeight });
+                        keys.TryAdd(str, new int[] { str.Length, similarWeight });
                     }
                 }
             });
 
-            if (!string.IsNullOrEmpty(foundWord) || !keys.Any())
+            if (!string.IsNullOrEmpty(foundWord))
             {
                 return foundWord;
             }
+            if (keys.Any())
+            {
+                int maxWeight = 0;
+                int minLength = 1000000;
+                List<KeyValuePair<string, int[]>> shortList = new List<KeyValuePair<string, int[]>>();
+                foreach (var kv in keys)
+                {
+                    var value = kv.Value;
+                    if (value[1] > maxWeight || (value[1] == maxWeight && value[0] <= minLength))
+                    {
+                        minLength = value[0];
+                        maxWeight = value[1];
+                        shortList.Add(kv);
+                    }
+                }
+                foundWord = shortList.Where(val => val.Value[1] == maxWeight && val.Value[0] == minLength).OrderBy(x => x.Key).FirstOrDefault().Key;
+            }
 
-            return keys.OrderByDescending(val => val.Value[1]).ThenBy(x => x.Value[0]).ThenBy(x => x.Key).FirstOrDefault().Key;
+            return foundWord;
         }
     }
 }
