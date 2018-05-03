@@ -30,6 +30,14 @@ namespace Cyriller
         /// <param name="MinWordLength">Минимальная длина окончания слова, которая позволяет различать слова</param>
         public string GetSimilar(string Word, IEnumerable<string> Collection, int MinWordLength = 2)
         {
+            if (MinWordLength < 2)
+            {
+                MinWordLength = 2;
+            }
+            else if (MinWordLength > 10)
+            {
+                MinWordLength = 10;
+            }
             if (Word == null || Word.Length < MinWordLength)
             {
                 return Word;
@@ -37,7 +45,8 @@ namespace Cyriller
 
             string foundWord = null;
             int wordLength = Word.Length;
-            int equalWeight = char.MaxValue;
+            int superLength = 10;
+            decimal superMultiply = 100;
             // SimilarWord => [lengthSimilarWord, similarWeight]
             ConcurrentDictionary<string, decimal[]> keys = new ConcurrentDictionary<string, decimal[]>();
             Parallel.ForEach(Collection, (str, loopState) =>
@@ -53,21 +62,30 @@ namespace Cyriller
                     int minLength = Math.Min(wordLength, strLength);
                     bool isSimilar = true;
                     decimal similarWeight = 0;
-                    int positionMultiply;
+                    decimal positionWeight = 0;
                     for (int i = 1; i <= minLength; i++)
                     {
-                        positionMultiply = minLength - i + 1;
-                        if (str[strLength - i] != Word[wordLength - i])
+                        if (str[strLength - i] == Word[wordLength - i])
                         {
-                            if (i <= MinWordLength)
+                            if (i <= superLength)
                             {
-                                isSimilar = false;
-                                break;
+                                positionWeight = (1 << (superLength - i + 1)) * superMultiply;
                             }
-
-                            positionMultiply--;
+                            else
+                            {
+                                positionWeight = 1;
+                            }
                         }
-                        similarWeight += positionMultiply * equalWeight;
+                        else if (i > MinWordLength)
+                        {
+                            positionWeight = 0;
+                        }
+                        else
+                        {
+                            isSimilar = false;
+                            break;
+                        }
+                        similarWeight += positionWeight;
                     }
                     if (isSimilar)
                     {
