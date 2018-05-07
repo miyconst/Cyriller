@@ -62,9 +62,9 @@ namespace Cyriller
                     int minLength = Math.Min(wordLength, strLength);
                     bool isSimilar = true;
                     int similarWeight = 0;
-                    int positionWeight = 0;
                     for (int i = 1; i <= minLength; i++)
                     {
+                        int positionWeight;
                         if (str[strLength - i] == Word[wordLength - i])
                         {
                             if (i <= superLength)
@@ -94,26 +94,28 @@ namespace Cyriller
                 }
             });
 
-            if (!string.IsNullOrEmpty(foundWord))
+            if (!string.IsNullOrEmpty(foundWord) || !keys.Any())
             {
                 return foundWord;
             }
-            if (keys.Any())
+
+            int valueWeight = 0;
+            int keyLength = 1000000;
+            foreach (var kv in keys)
             {
-                int maxWeight = 0;
-                int minLength = 1000000;
-                List<KeyValuePair<string, int[]>> shortList = new List<KeyValuePair<string, int[]>>();
-                foreach (var kv in keys)
+                var value = kv.Value;
+                var key = kv.Key;
+                if (value[1] < valueWeight || (value[1] == valueWeight && value[0] > keyLength))
                 {
-                    var value = kv.Value;
-                    if (value[1] > maxWeight || (value[1] == maxWeight && value[0] <= minLength))
-                    {
-                        minLength = value[0];
-                        maxWeight = value[1];
-                        shortList.Add(kv);
-                    }
+                    continue;
                 }
-                foundWord = shortList.Where(val => val.Value[1] == maxWeight && val.Value[0] == minLength).OrderBy(x => x.Key).FirstOrDefault().Key;
+
+                if (value[1] > valueWeight || value[0] < keyLength || key.CompareTo(foundWord) < 0)
+                {
+                    foundWord = key;
+                }
+                keyLength = value[0];
+                valueWeight = value[1];
             }
 
             return foundWord;
