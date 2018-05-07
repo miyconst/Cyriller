@@ -12,7 +12,7 @@ namespace Cyriller
     internal class CyrData
     {
         public CyrData()
-        { 
+        {
         }
 
         public TextReader GetData(string FileName)
@@ -24,45 +24,101 @@ namespace Cyriller
             return treader;
         }
 
-        /// <summary>
-        /// To do. Create a clever search algorithm.
-        /// </summary>
-        /// <param name="Word"></param>
-        /// <param name="Collection"></param>
-        /// <returns></returns>
-        public string GetSimilar(string Word, List<string> Collection)
+        /// <summary>Нахождение подходящего по окончанию слова в коллекции</summary>
+        /// <param name="Word">Искомое слово</param>
+        /// <param name="Collection">Список слов для поиска</param>
+        /// <param name="MinWordLength">Минимальная длина окончания слова, которая позволяет различать слова</param>
+        public string GetSimilar(string Word, IEnumerable<string> Collection, int MinWordLength = 2)
         {
-            if (Word.IsNullOrEmpty())
+            if (MinWordLength < 2)
+            {
+                MinWordLength = 2;
+            }
+            else if (MinWordLength > 10)
+            {
+                MinWordLength = 10;
+            }
+            if (Word == null || Word.Length < MinWordLength)
             {
                 return Word;
             }
 
-            ConcurrentDictionary<string, int> keys = new ConcurrentDictionary<string, int>();
-
-            /*foreach (string s in words.Keys)
+            string foundWord = null;
+            int wordLength = Word.Length;
+            int superLength = 10;
+            int superMultiply = 100;
+            // SimilarWord => [lengthSimilarWord, similarWeight]
+            ConcurrentDictionary<string, int[]> keys = new ConcurrentDictionary<string, int[]>();
+            Parallel.ForEach(Collection, (str, loopState) =>
             {
-                if (s.EndsWith(Word))
+                if (str == Word)
                 {
-                    keys.Add(s, s.Length);
+                    foundWord = str;
+                    loopState.Stop();
                 }
-            }*/
-
-            Collection.AsParallel().ForAll(s =>
-            {
-                if (s.EndsWith(Word))
+                else
                 {
-                    keys.TryAdd(s, s.Length);
+                    int strLength = str.Length;
+                    int minLength = Math.Min(wordLength, strLength);
+                    bool isSimilar = true;
+                    int similarWeight = 0;
+                    for (int i = 1; i <= minLength; i++)
+                    {
+                        int positionWeight;
+                        if (str[strLength - i] == Word[wordLength - i])
+                        {
+                            if (i <= superLength)
+                            {
+                                positionWeight = (1 << (superLength - i + 1)) * superMultiply;
+                            }
+                            else
+                            {
+                                positionWeight = 1;
+                            }
+                        }
+                        else if (i > MinWordLength)
+                        {
+                            positionWeight = 0;
+                        }
+                        else
+                        {
+                            isSimilar = false;
+                            break;
+                        }
+                        similarWeight += positionWeight;
+                    }
+                    if (isSimilar)
+                    {
+                        keys.TryAdd(str, new int[] { str.Length, similarWeight });
+                    }
                 }
             });
 
-            if (!keys.Any() && Word.Length > 2)
+            if (!string.IsNullOrEmpty(foundWord) || !keys.Any())
             {
-                return this.GetSimilar(Word.Substring(1), Collection);
+                return foundWord;
             }
 
-            string key = keys.OrderBy(val => val.Value).FirstOrDefault().Key;
+            int valueWeight = 0;
+            int keyLength = 1000000;
+            foreach (var kv in keys)
+            {
+                var value = kv.Value;
+                var key = kv.Key;
+                if (value[1] < valueWeight || (value[1] == valueWeight && value[0] > keyLength))
+                {
+                    continue;
+                }
 
-            return key;
+                if (value[1] > valueWeight || value[0] < keyLength || key.CompareTo(foundWord) < 0)
+                {
+                    foundWord = key;
+                }
+                keyLength = value[0];
+                valueWeight = value[1];
+            }
+
+            return foundWord;
         }
     }
 }
