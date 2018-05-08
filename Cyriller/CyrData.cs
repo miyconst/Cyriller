@@ -30,23 +30,32 @@ namespace Cyriller
         /// <param name="MinWordLength">Минимальная длина окончания слова, которая позволяет различать слова</param>
         public string GetSimilar(string Word, IEnumerable<string> Collection, int MinWordLength = 2)
         {
-            if (MinWordLength < 2)
+            const int minDiffLength = 2;
+            const int maxDiffLength = 10;
+            if (MinWordLength < minDiffLength)
             {
-                MinWordLength = 2;
+                MinWordLength = minDiffLength;
             }
-            else if (MinWordLength > 10)
+            else if (MinWordLength > maxDiffLength)
             {
-                MinWordLength = 10;
+                MinWordLength = maxDiffLength;
             }
             if (Word == null || Word.Length < MinWordLength)
             {
                 return Word;
             }
 
+            const int superLength = 10;
+            const int superMultiply = 100;
+            // вес позиции от конца слова
+            int[] weightPositions = new int[superLength];
+            for (int i = 0; i < superLength; i++)
+            {
+                weightPositions[i] = (1 << (superLength - i)) * superMultiply;
+            }
+
             string foundWord = null;
-            int wordLength = Word.Length;
-            int superLength = 10;
-            int superMultiply = 100;
+            int wordMaxPosition = Word.Length - 1;
             // SimilarWord => [lengthSimilarWord, similarWeight]
             ConcurrentDictionary<string, int[]> keys = new ConcurrentDictionary<string, int[]>();
             Parallel.ForEach(Collection, (str, loopState) =>
@@ -58,38 +67,25 @@ namespace Cyriller
                 }
                 else
                 {
-                    int strLength = str.Length;
-                    int minLength = Math.Min(wordLength, strLength);
+                    int strMaxPosition = str.Length - 1;
+                    int maxPosition = Math.Min(wordMaxPosition, strMaxPosition);
                     bool isSimilar = true;
                     int similarWeight = 0;
-                    for (int i = 1; i <= minLength; i++)
+                    for (int i = 0; i <= maxPosition; i++)
                     {
-                        int positionWeight;
-                        if (str[strLength - i] == Word[wordLength - i])
+                        if (str[strMaxPosition - i] == Word[wordMaxPosition - i])
                         {
-                            if (i <= superLength)
-                            {
-                                positionWeight = (1 << (superLength - i + 1)) * superMultiply;
-                            }
-                            else
-                            {
-                                positionWeight = 1;
-                            }
+                            similarWeight += i < superLength ? weightPositions[i] : 1;
                         }
-                        else if (i > MinWordLength)
-                        {
-                            positionWeight = 0;
-                        }
-                        else
+                        else if (i < MinWordLength)
                         {
                             isSimilar = false;
                             break;
                         }
-                        similarWeight += positionWeight;
                     }
                     if (isSimilar)
                     {
-                        keys.TryAdd(str, new int[] { str.Length, similarWeight });
+                        keys.TryAdd(str, new[] { str.Length, similarWeight });
                     }
                 }
             });
