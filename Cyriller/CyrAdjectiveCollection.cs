@@ -14,6 +14,7 @@ namespace Cyriller
         protected Dictionary<string, string> masculineWords = new Dictionary<string, string>();
         protected Dictionary<string, KeyValuePair<string, string>> feminineWords = new Dictionary<string, KeyValuePair<string, string>>();
         protected Dictionary<string, KeyValuePair<string, string>> neuterWords = new Dictionary<string, KeyValuePair<string, string>>();
+        /// <summary>Минимальная длина слова, которая позволяет различать слова</summary>
         protected int MinWordLength = 3;
 
         public CyrAdjectiveCollection()
