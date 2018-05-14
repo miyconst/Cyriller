@@ -11,7 +11,7 @@ namespace Cyriller
 {
     internal class CyrData
     {
-        /// <summary>Минимальная длина слова, которая позволяет различать слова</summary>
+        /// <summary>Минимальная длина слова</summary>
         public const int MinDiffLength = 2;
         /// <summary>Вес позиции от конца слова</summary>
         private static readonly int[] WeightPositions = { 102400, 51200, 25600, 12800, 6400, 3200, 1600, 800, 400, 200 };
