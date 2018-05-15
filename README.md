@@ -38,6 +38,8 @@ CyrResult plural = strict.DeclinePlural();
 // Получаем существительное из коллекции включая похожие слова.
 // Найдет "ёж".
 CyrNoun similar = collection.Get("еж", GetConditionsEnum.Similar);
+// Найдет "мелево".
+CyrNoun similar = collection.Get("милево", GetConditionsEnum.Similar);
 
 // Склоняем существительное в единственном числе.
 singular = noun.Decline();
