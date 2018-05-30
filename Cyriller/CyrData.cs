@@ -88,11 +88,17 @@ namespace Cyriller
                 return foundWord;
             }
 
-            SimilarCandidate candidate = candidates
-                .OrderByDescending(x => x.Weight)
-                .ThenBy(x => x.Name.Length)
-                .ThenBy(x => x.Name)
-                .FirstOrDefault();
+            SimilarCandidate candidate = null;
+            foreach (var c in candidates)
+            {
+                if (candidate == null
+                    || c.Weight > candidate.Weight
+                    || (c.Weight == candidate.Weight && c.Name.Length < candidate.Name.Length)
+                    || (c.Weight == candidate.Weight && c.Name.Length == candidate.Name.Length && c.Name.CompareTo(candidate.Name) < 0))
+                {
+                    candidate = c;
+                }
+            }
 
             return candidate?.Name;
         }
