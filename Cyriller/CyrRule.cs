@@ -9,9 +9,13 @@ namespace Cyriller
 {
     public class CyrRule
     {
+        /// <summary>Ending part of a word</summary>
         protected string end;
+        /// <summary>The number of characters to replace at the end of a word</summary>
         protected int cut;
 
+        /// <summary>The rule applied to the end of a word</summary>
+        /// <param name="Rule">A string that includes the applied ending and the number of characters to replace at the end of a word</param>
         public CyrRule(string Rule)
         {
             if (string.IsNullOrEmpty(Rule))
@@ -20,44 +24,29 @@ namespace Cyriller
                 this.cut = 0;
                 return;
             }
-
-            Regex reg = new Regex(@"\d", RegexOptions.IgnoreCase);
-            string temp;
-
-            this.end = reg.Replace(Rule, string.Empty);
-
-            if (this.end.Length > 0)
+            int pos = -1;
+            while (++pos < Rule.Length)
             {
-                temp = Rule.Replace(this.end, string.Empty);
-            }
-            else
-            {
-                temp = Rule;
+                if (Char.IsDigit(Rule[pos]))
+                    break;
             }
 
-            if (temp.IsNullOrEmpty())
-            {
-                this.cut = 0;
-            }
-            else
-            {
-                this.cut = int.Parse(temp);
-            }
+            this.end = Rule.Substring(0, pos);
+            int.TryParse(Rule.Substring(pos), out this.cut);
         }
 
+        /// <summary>Applies replacement rule for end of word</summary>
+        /// <param name="Name">The word, to which applies rule of replacement the ending</param>
         public string Apply(string Name)
         {
-            if (this.end == "*")
+            if (this.end == "*"
+                || string.IsNullOrEmpty(Name)
+                || Name.Length <= cut)
             {
                 return string.Empty;
             }
 
             int length = Name.Length - cut;
-
-            if (length <= 0)
-            {
-                return this.end;
-            }
 
             return Name.Substring(0, length) + end;
         }
