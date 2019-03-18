@@ -1,108 +1,18 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{18887BCA-64CF-4FD0-84F5-3003B3003640}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Cyriller</RootNamespace>
-    <AssemblyName>Cyriller</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
-    <RestorePackages>true</RestorePackages>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App_Data\adjective-rules.txt" />
-    <Compile Include="CyrAdjective.cs" />
-    <Compile Include="CyrAdjectiveCollection.cs" />
-    <Compile Include="CyrData.cs" />
-    <Compile Include="CyrDeclineCase.cs" />
-    <Compile Include="CyrNoun.cs" />
-    <Compile Include="CyrNounCollectionRow.cs" />
-    <Compile Include="CyrNumber.cs" />
-    <Compile Include="CyrNumber.Currency.cs" />
-    <Compile Include="CyrNumber.Item.cs" />
-    <Compile Include="CyrNumber.Strings.cs" />
-    <Compile Include="CyrPhrase.cs" />
-    <Compile Include="CyrResult.cs" />
-    <Compile Include="CyrRule.cs" />
-    <Compile Include="CyrName.cs" />
-    <Compile Include="CyrWordNotFoundException.cs" />
-    <Compile Include="Extensions.cs" />
-    <Compile Include="Model\AnimatesEnum.cs" />
-    <Compile Include="Model\CasesEnum.cs" />
-    <Compile Include="Model\GendersEnum.cs" />
-    <Compile Include="Model\GetConditionsEnum.cs" />
-    <Compile Include="Model\NumbersEnum.cs" />
-    <Compile Include="Model\SpeechPartsEnum.cs" />
-    <Compile Include="Model\WordTypesEnum.cs" />
-    <Compile Include="CyrNounCollection.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <None Include="App_Data\adjectives.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="App_Data\noun-rules.gz" />
-    <EmbeddedResource Include="App_Data\nouns.gz" />
-    <EmbeddedResource Include="App_Data\adjective-rules.gz" />
-    <EmbeddedResource Include="App_Data\adjectives.gz" />
-    <None Include="Cyriller.nuspec" />
-  </ItemGroup>
-  <ItemGroup>
-    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App_Data\noun-rules.txt" />
-    <None Include="App_Data\nouns.txt" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+        <TargetFrameworks>netstandard2.0;net45;net462</TargetFrameworks>
+        <PackageId>Miyconst.Cyriller</PackageId>
+        <Version>0.0.3</Version>
+        <Authors>Konstantin Mi</Authors>
+        <PackageLicenseUrl>https://github.com/miyconst/Cyriller/blob/master/LICENSE</PackageLicenseUrl>
+        <RepositoryUrl>https://github.com/miyconst/Cyriller</RepositoryUrl>
+        <PackageIconUrl>https://raw.githubusercontent.com/miyconst/Cyriller/master/Cyriller.Web/favicon.ico</PackageIconUrl>
+        <Description>Russian language declension library</Description>
+        <PackageReleaseNotes>Migrate to .net standard</PackageReleaseNotes>
+        <Copyright>Copyright 2014-2019</Copyright>
+        <PackageTags>склонение существительное прилагательное число падежам</PackageTags>
     </PropertyGroup>
-    <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
-  </Target>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+    <ItemGroup>
+        <EmbeddedResource Include="App_Data\*" />
+    </ItemGroup>
 </Project>
