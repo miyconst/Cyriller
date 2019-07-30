@@ -76,6 +76,12 @@
     <Compile Include="JsonForm.Designer.cs">
       <DependentUpon>JsonForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="LoadingForm.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="LoadingForm.Designer.cs">
+      <DependentUpon>LoadingForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Model\Animate.cs">
       <DependentUpon>CyrillerModel.tt</DependentUpon>
     </Compile>
@@ -152,6 +158,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="JsonForm.resx">
       <DependentUpon>JsonForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LoadingForm.resx">
+      <DependentUpon>LoadingForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="NounForm.resx">
       <DependentUpon>NounForm.cs</DependentUpon>

@@ -14,7 +14,7 @@ namespace Cyriller.Checker
 {
     public partial class NounForm : UserControl
     {
-        CyrNounCollection cyrCollection;
+        private static CyrNounCollection cyrCollection;
 
         public NounForm()
         {
@@ -37,17 +37,42 @@ namespace Cyriller.Checker
             txtLog.Text = line + txtLog.Text;
         }
 
-        private void NounForm_Load(object sender, EventArgs e)
+        private async void NounForm_Load(object sender, EventArgs e)
         {
-            Stopwatch watch = new Stopwatch();
-
-            watch.Start();
-            cyrCollection = new CyrNounCollection();
-            watch.Stop();
-            this.Log($"Создание {nameof(CyrNounCollection)} заняло {watch.Elapsed}.");
+            await this.LoadCollection();
 
             ddlAction.SelectedIndex = 0;
             this.ParentForm.AcceptButton = btnDecline;
+        }
+
+        private async Task LoadCollection()
+        {
+            if (cyrCollection != null)
+            {
+                return;
+            }
+
+            Stopwatch watch = new Stopwatch();
+            LoadingForm formLoading = new LoadingForm()
+            {
+                Dock = DockStyle.Fill
+            };
+
+            this.Cursor = Cursors.WaitCursor;
+            this.tlpMain.Visible = false;
+            this.Controls.Add(formLoading);
+
+            watch.Start();
+            await Task.Run(() =>
+            {
+                cyrCollection = new CyrNounCollection();
+            });
+            watch.Stop();
+
+            this.Log($"Создание {nameof(CyrNounCollection)} заняло {watch.Elapsed}.");
+            this.Cursor = Cursors.Default;
+            this.tlpMain.Visible = true;
+            this.Controls.Remove(formLoading);
         }
 
         private void btnDecline_Click(object sender, EventArgs e)

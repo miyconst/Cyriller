@@ -14,7 +14,7 @@ namespace Cyriller.Checker
 {
     public partial class AdjectiveForm : UserControl
     {
-        CyrAdjectiveCollection cyrCollection;
+        private static CyrAdjectiveCollection cyrCollection;
 
         public AdjectiveForm()
         {
@@ -38,20 +38,44 @@ namespace Cyriller.Checker
             txtLog.Text = line + txtLog.Text;
         }
 
-        private void AdjectiveForm_Load(object sender, EventArgs e)
+        private async void AdjectiveForm_Load(object sender, EventArgs e)
         {
+            await this.LoadCollection();
+
             ddlNumber.SelectedIndex = 0;
             ddlGender.SelectedIndex = 0;
             ddlAnimate.SelectedIndex = 0;
 
-            Stopwatch watch = new Stopwatch();
+            this.ParentForm.AcceptButton = btnDecline;
+        }
+
+        private async Task LoadCollection()
+        {
+            if (cyrCollection != null)
+            {
+                return;
+            }
+
+            Stopwatch watch = new Stopwatch(); LoadingForm formLoading = new LoadingForm()
+            {
+                Dock = DockStyle.Fill
+            };
+
+            this.Cursor = Cursors.WaitCursor;
+            this.tlpMain.Visible = false;
+            this.Controls.Add(formLoading);
 
             watch.Start();
-            cyrCollection = new CyrAdjectiveCollection();
+            await Task.Run(() =>
+            {
+                cyrCollection = new CyrAdjectiveCollection();
+            });
             watch.Stop();
-            this.Log($"Создание {nameof(CyrAdjectiveCollection)} заняло {watch.Elapsed}.");
 
-            this.ParentForm.AcceptButton = btnDecline;
+            this.Log($"Создание {nameof(CyrAdjectiveCollection)} заняло {watch.Elapsed}.");
+            this.Cursor = Cursors.Default;
+            this.tlpMain.Visible = true;
+            this.Controls.Remove(formLoading);
         }
 
         private void btnDecline_Click(object sender, EventArgs e)
