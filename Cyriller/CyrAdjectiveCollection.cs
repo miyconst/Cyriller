@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Concurrent;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -290,18 +289,17 @@ namespace Cyriller
         {
             bool rulesBlock = true;
 
-            List<Task> tasks = new List<Task>();
-            ConcurrentBag<KeyValuePair<DictionaryKey, CyrAdjective>> adjectives = new ConcurrentBag<KeyValuePair<DictionaryKey, CyrAdjective>>();
+            List<KeyValuePair<DictionaryKey, CyrAdjective>> adjectives = new List<KeyValuePair<DictionaryKey, CyrAdjective>>();
 
-            ConcurrentBag<string>[] pluralWordCandidates = new ConcurrentBag<string>[] { new ConcurrentBag<string>(), new ConcurrentBag<string>(), new ConcurrentBag<string>(), new ConcurrentBag<string>(), new ConcurrentBag<string>(), new ConcurrentBag<string>() };
-            ConcurrentBag<string>[] masculineWordCandidates = new ConcurrentBag<string>[] { new ConcurrentBag<string>(), new ConcurrentBag<string>(), new ConcurrentBag<string>(), new ConcurrentBag<string>(), new ConcurrentBag<string>(), new ConcurrentBag<string>() };
-            ConcurrentBag<string>[] feminineWordCandidates = new ConcurrentBag<string>[] { new ConcurrentBag<string>(), new ConcurrentBag<string>(), new ConcurrentBag<string>(), new ConcurrentBag<string>(), new ConcurrentBag<string>(), new ConcurrentBag<string>() };
-            ConcurrentBag<string>[] neuterWordCandidates = new ConcurrentBag<string>[] { new ConcurrentBag<string>(), new ConcurrentBag<string>(), new ConcurrentBag<string>(), new ConcurrentBag<string>(), new ConcurrentBag<string>(), new ConcurrentBag<string>() };
+            List<string>[] pluralWordCandidates = new List<string>[] { new List<string>(), new List<string>(), new List<string>(), new List<string>(), new List<string>(), new List<string>() };
+            List<string>[] masculineWordCandidates = new List<string>[] { new List<string>(), new List<string>(), new List<string>(), new List<string>(), new List<string>(), new List<string>() };
+            List<string>[] feminineWordCandidates = new List<string>[] { new List<string>(), new List<string>(), new List<string>(), new List<string>(), new List<string>(), new List<string>() };
+            List<string>[] neuterWordCandidates = new List<string>[] { new List<string>(), new List<string>(), new List<string>(), new List<string>(), new List<string>(), new List<string>() };
 
             TextReader treader = this.cyrData.GetData(AdjectivesResourceName);
             string line;
 
-            for (; ; )
+            while (true)
             {
                 line = treader.ReadLine();
 
@@ -333,12 +331,11 @@ namespace Cyriller
                 }
                 else
                 {
-                    tasks.Add(this.AddWordToDictionary(line, adjectives, masculineWordCandidates, feminineWordCandidates, neuterWordCandidates, pluralWordCandidates));
+                    this.AddWordToDictionary(line, adjectives, masculineWordCandidates, feminineWordCandidates, neuterWordCandidates, pluralWordCandidates);
                 }
             }
 
             treader.Dispose();
-            Task.WaitAll(tasks.ToArray());
 
             foreach (KeyValuePair<DictionaryKey, CyrAdjective> pair in adjectives)
             {
@@ -346,7 +343,7 @@ namespace Cyriller
             }
 
             IEnumerable<string> candidates = null;
-            ConcurrentBag<string>[][] candidatesCollections = new ConcurrentBag<string>[][]
+            List<string>[][] candidatesCollections = new List<string>[][]
             {
                 masculineWordCandidates,
                 feminineWordCandidates,
@@ -354,7 +351,7 @@ namespace Cyriller
                 pluralWordCandidates
             };
 
-            foreach (ConcurrentBag<string>[] collection in candidatesCollections)
+            foreach (List<string>[] collection in candidatesCollections)
             {
                 for (int i = 0; i < collection.Length; i++)
                 {
@@ -372,76 +369,73 @@ namespace Cyriller
             this.wordCandidates = candidates.Distinct().ToArray();
         }
 
-        protected virtual Task AddWordToDictionary
+        protected virtual void AddWordToDictionary
         (
             string line,
-            ConcurrentBag<KeyValuePair<DictionaryKey, CyrAdjective>> adjectives,
-            ConcurrentBag<string>[] masculineWordCandidates,
-            ConcurrentBag<string>[] feminineWordCandidates,
-            ConcurrentBag<string>[] neuterWordCandidates,
-            ConcurrentBag<string>[] pluralWordCandidates
+            List<KeyValuePair<DictionaryKey, CyrAdjective>> adjectives,
+            List<string>[] masculineWordCandidates,
+            List<string>[] feminineWordCandidates,
+            List<string>[] neuterWordCandidates,
+            List<string>[] pluralWordCandidates
         )
         {
-            return Task.Run(() =>
+            string[] parts = line.Split(' ');
+
+            int ruleIndex = int.Parse(parts[1]);
+            CyrRule[] rules = this.rules[ruleIndex];
+            CyrAdjective adjective = new CyrAdjective(parts[0], rules);
+
+            // Женский и средний род склоняются одинаково для одушевленных и неодушевленных предметов.
             {
-                string[] parts = line.Split(' ');
+                CyrResult result = adjective.Decline(GendersEnum.Feminine, AnimatesEnum.Animated);
 
-                int ruleIndex = int.Parse(parts[1]);
-                CyrRule[] rules = this.rules[ruleIndex];
-                CyrAdjective adjective = new CyrAdjective(parts[0], rules);
-
-                // Женский и средний род склоняются одинаково для одушевленных и неодушевленных предметов.
+                foreach (CasesEnum @case in cases)
                 {
-                    CyrResult result = adjective.Decline(GendersEnum.Feminine, AnimatesEnum.Animated);
+                    feminineWordCandidates[(int)@case - 1].Add(result[(int)@case]);
 
-                    foreach (CasesEnum @case in cases)
+                    foreach (AnimatesEnum animate in this.animates)
                     {
-                        feminineWordCandidates[(int)@case - 1].Add(result[(int)@case]);
-
-                        foreach (AnimatesEnum animate in this.animates)
-                        {
-                            DictionaryKey key = new DictionaryKey(result[(int)@case], GendersEnum.Feminine, @case, NumbersEnum.Singular, animate);
-                            adjectives.Add(new KeyValuePair<DictionaryKey, CyrAdjective>(key, adjective));
-                        }
-                    }
-                }
-                {
-                    CyrResult result = adjective.Decline(GendersEnum.Neuter, AnimatesEnum.Animated);
-
-                    foreach (CasesEnum @case in cases)
-                    {
-                        neuterWordCandidates[(int)@case - 1].Add(result[(int)@case]);
-
-                        foreach (AnimatesEnum animate in this.animates)
-                        {
-                            DictionaryKey key = new DictionaryKey(result[(int)@case], GendersEnum.Neuter, @case, NumbersEnum.Singular, animate);
-                            adjectives.Add(new KeyValuePair<DictionaryKey, CyrAdjective>(key, adjective));
-                        }
-                    }
-                }
-
-                // Мужской род и множественное число склоняются по-разному для одушевленных и неодушевленных предметов.
-                foreach (AnimatesEnum animate in animates)
-                {
-                    CyrResult result = adjective.Decline(GendersEnum.Masculine, animate);
-
-                    foreach (CasesEnum @case in cases)
-                    {
-                        DictionaryKey key = new DictionaryKey(result[(int)@case], GendersEnum.Masculine, @case, NumbersEnum.Singular, animate);
+                        DictionaryKey key = new DictionaryKey(result[(int)@case], GendersEnum.Feminine, @case, NumbersEnum.Singular, animate);
                         adjectives.Add(new KeyValuePair<DictionaryKey, CyrAdjective>(key, adjective));
-                        masculineWordCandidates[(int)@case - 1].Add(key.Name);
-                    }
-
-                    result = adjective.DeclinePlural(animate);
-
-                    foreach (CasesEnum @case in cases)
-                    {
-                        DictionaryKey key = new DictionaryKey(result[(int)@case], 0, @case, NumbersEnum.Plural, animate);
-                        adjectives.Add(new KeyValuePair<DictionaryKey, CyrAdjective>(key, adjective));
-                        pluralWordCandidates[(int)@case - 1].Add(key.Name);
                     }
                 }
-            });
+            }
+            {
+                CyrResult result = adjective.Decline(GendersEnum.Neuter, AnimatesEnum.Animated);
+
+                foreach (CasesEnum @case in cases)
+                {
+                    neuterWordCandidates[(int)@case - 1].Add(result[(int)@case]);
+
+                    foreach (AnimatesEnum animate in this.animates)
+                    {
+                        DictionaryKey key = new DictionaryKey(result[(int)@case], GendersEnum.Neuter, @case, NumbersEnum.Singular, animate);
+                        adjectives.Add(new KeyValuePair<DictionaryKey, CyrAdjective>(key, adjective));
+                    }
+                }
+            }
+
+            // Мужской род и множественное число склоняются по-разному для одушевленных и неодушевленных предметов.
+            foreach (AnimatesEnum animate in animates)
+            {
+                CyrResult result = adjective.Decline(GendersEnum.Masculine, animate);
+
+                foreach (CasesEnum @case in cases)
+                {
+                    DictionaryKey key = new DictionaryKey(result[(int)@case], GendersEnum.Masculine, @case, NumbersEnum.Singular, animate);
+                    adjectives.Add(new KeyValuePair<DictionaryKey, CyrAdjective>(key, adjective));
+                    masculineWordCandidates[(int)@case - 1].Add(key.Name);
+                }
+
+                result = adjective.DeclinePlural(animate);
+
+                foreach (CasesEnum @case in cases)
+                {
+                    DictionaryKey key = new DictionaryKey(result[(int)@case], 0, @case, NumbersEnum.Plural, animate);
+                    adjectives.Add(new KeyValuePair<DictionaryKey, CyrAdjective>(key, adjective));
+                    pluralWordCandidates[(int)@case - 1].Add(key.Name);
+                }
+            }
         }
         #endregion
     }

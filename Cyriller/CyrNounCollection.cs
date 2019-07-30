@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Concurrent;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -48,8 +47,8 @@ namespace Cyriller
 
             treader = data.GetData(NounsResourceName);
 
-            ConcurrentBag<string>[] singularWordCandidates = new ConcurrentBag<string>[] { new ConcurrentBag<string>(), new ConcurrentBag<string>(), new ConcurrentBag<string>(), new ConcurrentBag<string>(), new ConcurrentBag<string>(), new ConcurrentBag<string>() };
-            ConcurrentBag<string>[] pluralWordCandidates = new ConcurrentBag<string>[] { new ConcurrentBag<string>(), new ConcurrentBag<string>(), new ConcurrentBag<string>(), new ConcurrentBag<string>(), new ConcurrentBag<string>(), new ConcurrentBag<string>() };
+            List<string>[] singularWordCandidates = new List<string>[] { new List<string>(), new List<string>(), new List<string>(), new List<string>(), new List<string>(), new List<string>() };
+            List<string>[] pluralWordCandidates = new List<string>[] { new List<string>(), new List<string>(), new List<string>(), new List<string>(), new List<string>(), new List<string>() };
 
             while (true)
             {
@@ -92,12 +91,12 @@ namespace Cyriller
             {
                 IEnumerable<string> candidates = new string[0];
 
-                foreach (ConcurrentBag<string> candidate in singularWordCandidates)
+                foreach (List<string> candidate in singularWordCandidates)
                 {
                     candidates = candidates.Concat(candidate);
                 }
 
-                foreach (ConcurrentBag<string> candidate in pluralWordCandidates)
+                foreach (List<string> candidate in pluralWordCandidates)
                 {
                     candidates = candidates.Concat(candidate);
                 }
@@ -324,7 +323,7 @@ namespace Cyriller
         /// Строка со словом в формате словаря.
         /// Смотри /Cyriller/App_Data/nouns.txt.
         /// </param>
-        protected virtual void AddWordToTheCollection(string line, ConcurrentBag<string>[] singularWordCandidates, ConcurrentBag<string>[] pluralWordCandidates)
+        protected virtual void AddWordToTheCollection(string line, List<string>[] singularWordCandidates, List<string>[] pluralWordCandidates)
         {
             string[] parts = line.Split(' ');
 
