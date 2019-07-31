@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("http://www.miyconst.com/")]
 [assembly: AssemblyProduct("Cyriller.Checker")]
-[assembly: AssemblyCopyright("Copyright © Konstantin Mi  2015")]
+[assembly: AssemblyCopyright("Copyright © Konstantin Mi  2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

@@ -7,6 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Reflection;
+using System.IO;
+using System.Diagnostics;
 
 namespace Cyriller.Checker
 {
@@ -30,6 +33,11 @@ namespace Cyriller.Checker
         private void lblGitHub_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             System.Diagnostics.Process.Start(lblGitHub.Text);
+        }
+
+        private void AboutForm_Load(object sender, EventArgs e)
+        {
+            this.lblVersion.Text = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).ProductVersion;
         }
     }
 }
