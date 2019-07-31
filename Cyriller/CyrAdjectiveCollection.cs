@@ -22,11 +22,6 @@ namespace Cyriller
         /// </summary>
         protected Dictionary<DictionaryKey, CyrAdjective> words = new Dictionary<DictionaryKey, CyrAdjective>();
 
-        /// <summary>
-        /// Список всех прилагательных во всех доступных формах, для поиска наиболее подходящего совпадения, если слово отсутствует в словаре.
-        /// </summary>
-        protected string[] wordCandidates;
-
         protected AnimatesEnum[] animates = Enum.GetValues(typeof(AnimatesEnum)).OfType<AnimatesEnum>().ToArray();
 
         /// <summary>
@@ -175,7 +170,7 @@ namespace Cyriller
                 return new CyrAdjective(adjective);
             }
 
-            foundWord = this.cyrData.GetSimilar(word, this.wordCandidates, this.AdjectiveMinSameLetters, this.AdjectiveMaxSameLetters);
+            foundWord = this.GetSimilar(word, this.AdjectiveMinSameLetters, this.AdjectiveMaxSameLetters);
 
             if (string.IsNullOrEmpty(foundWord))
             {
@@ -260,7 +255,7 @@ namespace Cyriller
                 return new CyrAdjective(adjective);
             }
 
-            foundWord = this.cyrData.GetSimilar(word, this.wordCandidates, this.AdjectiveMinSameLetters, this.AdjectiveMaxSameLetters);
+            foundWord = this.GetSimilar(word, this.AdjectiveMinSameLetters, this.AdjectiveMaxSameLetters);
 
             if (string.IsNullOrEmpty(foundWord))
             {
@@ -366,7 +361,7 @@ namespace Cyriller
                 }
             }
 
-            this.wordCandidates = candidates.Distinct().ToArray();
+            this.wordCandidates = candidates.Distinct().ToList();
         }
 
         protected virtual void AddWordToDictionary

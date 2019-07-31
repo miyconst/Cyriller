@@ -24,11 +24,6 @@ namespace Cyriller
         protected Dictionary<DictionaryKey, CyrNoun> words = new Dictionary<DictionaryKey, CyrNoun>();
 
         /// <summary>
-        /// Список всех существительных во всех доступных формах, для поиска наиболее подходящего совпадения, если слово отсутствует в словаре.
-        /// </summary>
-        protected List<string> wordCandidates;
-
-        /// <summary>
         /// Минимальное кол-во совпадающих символов с конца слова, при поиске наиболее подходящего варианта.
         /// </summary>
         public int NounMinSameLetters { get; set; } = 2;
@@ -160,7 +155,7 @@ namespace Cyriller
             CyrNoun noun;
 
             // Существительные, без формы единственного числа, не имеют рода. К примеру "ворота" или "шахматы".
-            GendersEnum[] gendersWithZero = new GendersEnum[] { GendersEnum.Masculine, GendersEnum.Feminine, GendersEnum.Neuter, 0 };
+            GendersEnum[] gendersWithZero = new GendersEnum[] { GendersEnum.Masculine, GendersEnum.Feminine, GendersEnum.Neuter, GendersEnum.Undefined };
 
             foreach (CasesEnum c in this.cases)
             {
@@ -206,7 +201,7 @@ namespace Cyriller
                 return new CyrNoun(noun);
             }
 
-            foundWord = this.cyrData.GetSimilar(word, this.wordCandidates, this.NounMinSameLetters, this.NounMaxSameLetters);
+            foundWord = this.GetSimilar(word, this.NounMinSameLetters, this.NounMaxSameLetters);
 
             if (string.IsNullOrEmpty(foundWord))
             {
@@ -288,7 +283,7 @@ namespace Cyriller
                 return new CyrNoun(noun);
             }
 
-            foundWord = this.cyrData.GetSimilar(word, this.wordCandidates, this.NounMinSameLetters, this.NounMaxSameLetters);
+            foundWord = this.GetSimilar(word, this.NounMinSameLetters, this.NounMaxSameLetters);
 
             if (string.IsNullOrEmpty(foundWord))
             {
