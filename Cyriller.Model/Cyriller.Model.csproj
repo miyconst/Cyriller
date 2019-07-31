@@ -2,6 +2,17 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
+    <Version>0.1.0</Version>
+    <AssemblyVersion>0.1.0.0</AssemblyVersion>
+    <Authors>Konstantin Mi (miyconst)</Authors>
+    <Company>http://www.miyconst.com/</Company>
+    <Description>Russian language declension library</Description>
+    <Copyright>Copyright © Konstantin Mi 2014-2019</Copyright>
+    <PackageLicenseUrl>https://github.com/miyconst/Cyriller/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/miyconst/Cyriller</PackageProjectUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/miyconst/Cyriller/master/Cyriller.Web/favicon.ico</PackageIconUrl>
+    <RepositoryUrl>https://github.com/miyconst/Cyriller</RepositoryUrl>
+    <PackageTags>склонение существительное прилагательное число падеж</PackageTags>
   </PropertyGroup>
 
 </Project>
