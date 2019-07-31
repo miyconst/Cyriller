@@ -12,10 +12,10 @@ namespace Cyriller
         protected CyrNounCollection nounCollection;
         protected CyrAdjectiveCollection adjCollection;
 
-        public CyrPhrase(CyrNounCollection NounCollection, CyrAdjectiveCollection AdjCollection)
+        public CyrPhrase(CyrNounCollection nounCollection, CyrAdjectiveCollection adjCollection)
         {
-            this.nounCollection = NounCollection;
-            this.adjCollection = AdjCollection;
+            this.nounCollection = nounCollection;
+            this.adjCollection = adjCollection;
         }
 
         public SpeechPartsEnum DetermineSpeechPart(string word)
