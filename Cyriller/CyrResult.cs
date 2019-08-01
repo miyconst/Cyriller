@@ -40,6 +40,21 @@ namespace Cyriller
             this.case6 = case6;
         }
 
+        public CyrResult(string[] cases)
+        {
+            if (cases.Length != 6)
+            {
+                throw new ArgumentException("Declension result must have six parts.");
+            }
+
+            this.case1 = cases[0];
+            this.case2 = cases[1];
+            this.case3 = cases[2];
+            this.case4 = cases[3];
+            this.case5 = cases[4];
+            this.case6 = cases[5];
+        }
+
         public static CyrResult operator +(CyrResult a, CyrResult b)
         {
             return new CyrResult(a.case1 + " " + b.case1,
