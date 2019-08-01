@@ -9,11 +9,28 @@ namespace Cyriller
 {
     public partial class CyrNumber
     {
+        /// <summary>
+        /// Максимально большое число для написания прописью.
+        /// </summary>
+        public const long MaxValue = 9999999999;
+
+        /// <summary>
+        /// Склоняет число прописью в мужском роде <see cref="GendersEnum.Masculine"/> для неодушевленных предметов <see cref="AnimatesEnum.Inanimated"/>.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public CyrResult Decline(long value)
         {
             return this.Decline(value, GendersEnum.Masculine, AnimatesEnum.Inanimated);
         }
 
+        /// <summary>
+        /// Склоняет число прописью в указанном роде и одушевленности.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="gender"></param>
+        /// <param name="animate"></param>
+        /// <returns></returns>
         public CyrResult Decline(long value, GendersEnum gender, AnimatesEnum animate)
         {
             CyrResult result = new CyrResult(
@@ -28,11 +45,23 @@ namespace Cyriller
             return result;
         }
 
+        /// <summary>
+        /// Склоняет число прописью в мужском роде <see cref="GendersEnum.Masculine"/> для неодушевленных предметов <see cref="AnimatesEnum.Inanimated"/>.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public CyrResult Decline(decimal value)
         {
             return this.Decline(value, GendersEnum.Masculine, AnimatesEnum.Inanimated);
         }
 
+        /// <summary>
+        /// Склоняет число прописью в указанном роде и одушевленности.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="gender"></param>
+        /// <param name="animate"></param>
+        /// <returns></returns>
         public CyrResult Decline(decimal value, GendersEnum gender, AnimatesEnum animate)
         {
             CyrResult result = new CyrResult(
@@ -47,6 +76,12 @@ namespace Cyriller
             return result;
         }
 
+        /// <summary>
+        /// Склоняет денежную сумму в указанной валюте.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="currency"></param>
+        /// <returns></returns>
         public CyrResult Decline(decimal value, Currency currency)
         {
             CyrResult result = new CyrResult(
@@ -61,6 +96,12 @@ namespace Cyriller
             return result;
         }
 
+        /// <summary>
+        /// Склоняет количество указанных единиц.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="item"></param>
+        /// <returns></returns>
         public CyrResult Decline(decimal value, Item item)
         {
             CyrResult result = new CyrResult(
@@ -75,16 +116,36 @@ namespace Cyriller
             return result;
         }
 
+        /// <summary>
+        /// Склоняет число прописью в указнный падеж мужского рода <see cref="GendersEnum.Masculine"/> для неодушевленных предметов <see cref="AnimatesEnum.Inanimated"/>.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="case"></param>
+        /// <returns></returns>
         public string ToString(long value, CasesEnum @case)
         {
             return this.ToString(value, @case, GendersEnum.Masculine, AnimatesEnum.Inanimated);
         }
 
+        /// <summary>
+        /// Склоняет число прописью в указнный падеж мужского рода <see cref="GendersEnum.Masculine"/> для неодушевленных предметов <see cref="AnimatesEnum.Inanimated"/>.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="case"></param>
+        /// <returns></returns>
         public string ToString(decimal value, CasesEnum @case)
         {
             return this.ToString(value, @case, GendersEnum.Masculine, AnimatesEnum.Inanimated);
         }
 
+        /// <summary>
+        /// Склоняет число прописью в указнный падеж, род и одушевленность.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="case"></param>
+        /// <param name="gender"></param>
+        /// <param name="animate"></param>
+        /// <returns></returns>
         public string ToString(decimal value, CasesEnum @case, GendersEnum gender, AnimatesEnum animate)
         {
             string str = value.ToString(System.Globalization.CultureInfo.InvariantCulture);
@@ -138,6 +199,13 @@ namespace Cyriller
             return sb.ToString();
         }
 
+        /// <summary>
+        /// Склоняет денежную сумму в указанный падеж и валюту.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="case"></param>
+        /// <param name="currency"></param>
+        /// <returns></returns>
         public string ToString(decimal value, CasesEnum @case, Currency currency)
         {
             string str = value.ToString(System.Globalization.CultureInfo.InvariantCulture);
@@ -184,6 +252,13 @@ namespace Cyriller
             return sb.ToString();
         }
 
+        /// <summary>
+        /// Склоняет количество указанных единиц в указанный падеж.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="case"></param>
+        /// <param name="item"></param>
+        /// <returns></returns>
         public string ToString(decimal value, CasesEnum @case, Item item)
         {
             long i = (long)value;
@@ -209,11 +284,20 @@ namespace Cyriller
             return sb.ToString();
         }
 
+        /// <summary>
+        /// Склоняет число прописью в указнный падеж, род и одушевленность.
+        /// Выбрасывает <see cref="ArgumentOutOfRangeException"/>, если значение больше максимально допустимого <see cref="MaxValue"/>.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="case"></param>
+        /// <param name="gender"></param>
+        /// <param name="animate"></param>
+        /// <returns></returns>
         public string ToString(long value, CasesEnum @case, GendersEnum gender, AnimatesEnum animate)
         {
-            if (value > 9999999999)
+            if (value > MaxValue)
             {
-                throw new ArgumentOutOfRangeException("The maximum value is 9999999999.");
+                throw new ArgumentOutOfRangeException($"The maximum value is {MaxValue}.");
             }
 
             Strings s = new Strings(@case, gender, animate);
@@ -279,6 +363,17 @@ namespace Cyriller
             return r.ToString().Trim(' ');
         }
 
+        /// <summary>
+        /// Выбирает правильный вариант слова в зависимости от указанного числа.
+        /// 1 - one (один кот)
+        /// 2..4 - two (два кота, три кота, четыре кота)
+        /// >4 - five (пять котов, шесть котов ...)
+        /// </summary>
+        /// <param name="value">Число для выбора правильного варианта слова.</param>
+        /// <param name="one">Вариант слова для употребления с числительным один.</param>
+        /// <param name="two">Вариант слова для употребления с числительными два, три, четыре.</param>
+        /// <param name="five">Вариант слова для употребления с числительными больше четырех.</param>
+        /// <returns></returns>
         public string Case(long value, string one, string two, string five)
         {
             long t = (value % 100 > 20) ? value % 10 : value % 20;
