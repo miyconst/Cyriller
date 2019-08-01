@@ -33,6 +33,11 @@ namespace Cyriller
         /// </summary>
         public int NounMaxSameLetters { get; set; } = int.MaxValue;
 
+        /// <summary>
+        /// Кэш для слов, которых нет в словаре, при поиске с указанием рода, падежа и числа.
+        /// </summary>
+        public Dictionary<DictionaryKey, string> similarSearchByKeyCache = new Dictionary<DictionaryKey, string>();
+
         public CyrNounCollection()
         {
             CyrData data = new CyrData();
@@ -283,23 +288,46 @@ namespace Cyriller
                 return new CyrNoun(noun);
             }
 
-            foundWord = this.GetSimilar(word, this.NounMinSameLetters, this.NounMaxSameLetters);
+            DictionaryKey key = default;
 
-            if (string.IsNullOrEmpty(foundWord))
+            foundWord = null;
+
+            if (this.EnableCache)
             {
-                return null;
+                key = new DictionaryKey(word, gender, @case, number);
+
+                if (this.similarSearchByKeyCache.TryGetValue(key, out foundWord))
+                {
+                    noun = this.GetOrDefault(foundWord, gender, @case, number);
+                    noun = new CyrNoun(noun);
+                    noun.SetName(word, @case, number);
+
+                    return noun;
+                }
             }
 
-            noun = this.GetOrDefault(foundWord, gender, @case, number);
-
-            if (noun != null)
+            foreach (string candidate in this.cyrData.GetSimilars(word, this.wordCandidates, this.NounMinSameLetters, this.NounMaxSameLetters))
             {
+                noun = this.GetOrDefault(candidate, gender, @case, number);
+
+                if (noun == null)
+                {
+                    continue;
+                }
+
                 noun = new CyrNoun(noun);
                 noun.SetName(word, @case, number);
-                return noun;
+                foundWord = candidate;
+
+                break;
             }
 
-            return null;
+            if (this.EnableCache)
+            {
+                this.similarSearchByKeyCache.Add(key, foundWord);
+            }
+
+            return noun;
         }
 
         /// <summary>
