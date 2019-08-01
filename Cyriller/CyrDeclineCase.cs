@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Cyriller.Model;
 
 namespace Cyriller
 {
@@ -12,6 +13,20 @@ namespace Cyriller
         public string NameEn { get; protected set; }
         public string Description { get; protected set; }
         public int Index { get; protected set; }
+        public CasesEnum Value { get; protected set; }
+
+        protected CyrDeclineCase()
+        {
+        }
+
+        public CyrDeclineCase(string nameRu, string nameEn, string description, int index, CasesEnum value)
+        {
+            this.NameRu = nameRu;
+            this.NameEn = nameEn;
+            this.Description = description;
+            this.Index = index;
+            this.Value = value;
+        }
 
         public static CyrDeclineCase[] List
         {
@@ -21,6 +36,9 @@ namespace Cyriller
             }
         }
 
+        /// <summary>
+        /// Именительный (Nominative), Кто? Что? (есть).
+        /// </summary>
         public static CyrDeclineCase Case1
         {
             get
@@ -30,11 +48,15 @@ namespace Cyriller
                     NameRu = "Именительный",
                     NameEn = "Nominative",
                     Description = "Кто? Что? (есть)",
-                    Index = 1
+                    Index = 1,
+                    Value = CasesEnum.Nominative
                 };
             }
         }
 
+        /// <summary>
+        /// Родительный (Genitive), Кого? Чего? (нет).
+        /// </summary>
         public static CyrDeclineCase Case2
         {
             get
@@ -44,11 +66,15 @@ namespace Cyriller
                     NameRu = "Родительный",
                     NameEn = "Genitive",
                     Description = "Кого? Чего? (нет)",
-                    Index = 2
+                    Index = 2,
+                    Value = CasesEnum.Genitive
                 };
             }
         }
 
+        /// <summary>
+        /// Дательный (Dative), Кому? Чему? (дам).
+        /// </summary>
         public static CyrDeclineCase Case3
         {
             get
@@ -58,11 +84,15 @@ namespace Cyriller
                     NameRu = "Дательный",
                     NameEn = "Dative",
                     Description = "Кому? Чему? (дам)",
-                    Index = 3
+                    Index = 3,
+                    Value = CasesEnum.Dative
                 };
             }
         }
 
+        /// <summary>
+        /// Винительный (Accusative), Кого? Что? (вижу).
+        /// </summary>
         public static CyrDeclineCase Case4
         {
             get
@@ -72,11 +102,15 @@ namespace Cyriller
                     NameRu = "Винительный",
                     NameEn = "Accusative",
                     Description = "Кого? Что? (вижу)",
-                    Index = 4
+                    Index = 4,
+                    Value = CasesEnum.Accusative
                 };
             }
         }
 
+        /// <summary>
+        /// Творительный (Instrumental), Кем? Чем? (горжусь).
+        /// </summary>
         public static CyrDeclineCase Case5
         {
             get
@@ -86,11 +120,15 @@ namespace Cyriller
                     NameRu = "Творительный",
                     NameEn = "Instrumental",
                     Description = "Кем? Чем? (горжусь)",
-                    Index = 5
+                    Index = 5,
+                    Value = CasesEnum.Instrumental
                 };
             }
         }
 
+        /// <summary>
+        /// Предложный (Prepositional), О ком? О чем? (думаю).
+        /// </summary>
         public static CyrDeclineCase Case6
         {
             get
@@ -100,15 +138,16 @@ namespace Cyriller
                     NameRu = "Предложный",
                     NameEn = "Prepositional",
                     Description = "О ком? О чем? (думаю)",
-                    Index = 6
+                    Index = 6,
+                    Value = CasesEnum.Prepositional
                 };
             }
         }
 
         /// <summary>
-        /// Именительный, Кто? Что? (есть)
+        /// Именительный (Nominative), Кто? Что? (есть).
         /// </summary>
-        public CyrDeclineCase Nominative
+        public static CyrDeclineCase Nominative
         {
             get
             {
@@ -117,9 +156,9 @@ namespace Cyriller
         }
 
         /// <summary>
-        /// Родительный, Кого? Чего? (нет)
+        /// Родительный (Genitive), Кого? Чего? (нет).
         /// </summary>
-        public CyrDeclineCase Genitive
+        public static CyrDeclineCase Genitive
         {
             get
             {
@@ -128,9 +167,9 @@ namespace Cyriller
         }
 
         /// <summary>
-        /// Дательный, Кому? Чему? (дам)
+        /// Дательный (Dative), Кому? Чему? (дам).
         /// </summary>
-        public CyrDeclineCase Dative
+        public static CyrDeclineCase Dative
         {
             get
             {
@@ -139,9 +178,9 @@ namespace Cyriller
         }
 
         /// <summary>
-        /// Винительный, Кого? Что? (вижу)
+        /// Винительный (Accusative), Кого? Что? (вижу).
         /// </summary>
-        public CyrDeclineCase Accusative
+        public static CyrDeclineCase Accusative
         {
             get
             {
@@ -150,9 +189,9 @@ namespace Cyriller
         }
 
         /// <summary>
-        /// Творительный, Кем? Чем? (горжусь)
+        /// Творительный (Instrumental), Кем? Чем? (горжусь).
         /// </summary>
-        public CyrDeclineCase Instrumental
+        public static CyrDeclineCase Instrumental
         {
             get
             {
@@ -161,9 +200,9 @@ namespace Cyriller
         }
 
         /// <summary>
-        /// Предложный, О ком? О чем? (думаю)
+        /// Предложный (Prepositional), О ком? О чем? (думаю).
         /// </summary>
-        public CyrDeclineCase Prepositional
+        public static CyrDeclineCase Prepositional
         {
             get
             {
@@ -172,9 +211,9 @@ namespace Cyriller
         }
 
         /// <summary>
-        /// Именительный, Кто? Что? (есть)
+        /// Именительный (Nominative), Кто? Что? (есть).
         /// </summary>
-        public CyrDeclineCase Именительный
+        public static CyrDeclineCase Именительный
         {
             get
             {
@@ -183,9 +222,9 @@ namespace Cyriller
         }
 
         /// <summary>
-        /// Родительный, Кого? Чего? (нет)
+        /// Родительный (Genitive), Кого? Чего? (нет).
         /// </summary>
-        public CyrDeclineCase Родительный
+        public static CyrDeclineCase Родительный
         {
             get
             {
@@ -194,9 +233,9 @@ namespace Cyriller
         }
 
         /// <summary>
-        /// Дательный, Кому? Чему? (дам)
+        /// Дательный (Dative), Кому? Чему? (дам).
         /// </summary>
-        public CyrDeclineCase Дательный
+        public static CyrDeclineCase Дательный
         {
             get
             {
@@ -205,9 +244,9 @@ namespace Cyriller
         }
 
         /// <summary>
-        /// Винительный, Кого? Что? (вижу)
+        /// Винительный (Accusative), Кого? Что? (вижу).
         /// </summary>
-        public CyrDeclineCase Винительный
+        public static CyrDeclineCase Винительный
         {
             get
             {
@@ -216,9 +255,9 @@ namespace Cyriller
         }
 
         /// <summary>
-        /// Творительный, Кем? Чем? (горжусь)
+        /// Творительный (Instrumental), Кем? Чем? (горжусь).
         /// </summary>
-        public CyrDeclineCase Творительный
+        public static CyrDeclineCase Творительный
         {
             get
             {
@@ -227,9 +266,9 @@ namespace Cyriller
         }
 
         /// <summary>
-        /// Предложный, О ком? О чем? (думаю)
+        /// Предложный (Prepositional), О ком? О чем? (думаю).
         /// </summary>
-        public CyrDeclineCase Предложный
+        public static CyrDeclineCase Предложный
         {
             get
             {
