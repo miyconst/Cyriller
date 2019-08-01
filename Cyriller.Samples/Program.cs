@@ -9,6 +9,7 @@ namespace Cyriller.Samples
         private static CyrNounCollection cyrNounCollection;
         private static CyrAdjectiveCollection cyrAdjectiveCollection;
         private static CyrPhrase cyrPhrase;
+        private static CyrName cyrName = new CyrName();
 
         static void Main(string[] args)
         {
@@ -21,6 +22,7 @@ namespace Cyriller.Samples
             cyrAdjectiveCollection = new CyrAdjectiveCollection();
 
             cyrPhrase = new CyrPhrase(cyrNounCollection, cyrAdjectiveCollection);
+            cyrName = new CyrName();
 
             Console.WriteLine("Склоняю существительные.");
             Console.WriteLine();
@@ -33,6 +35,10 @@ namespace Cyriller.Samples
             Console.WriteLine("Склоняю словосочетания.");
             Console.WriteLine();
             PhraseSamples();
+
+            Console.WriteLine("Склоняю имена без использования словаря.");
+            Console.WriteLine();
+            NameSamples();
         }
 
         static void NounSamples()
@@ -103,6 +109,58 @@ namespace Cyriller.Samples
                 Console.WriteLine("Склоняю словосочетание с поиском слов по неточному совпадению.");
                 CyrResult result = cyrPhrase.Decline(phrase, GetConditionsEnum.Similar);
                 WriteToConsole(phrase, result);
+            }
+        }
+
+        static void NameSamples()
+        {
+            CyrDeclineCase[] cases = CyrDeclineCase.List;
+
+            {
+                Console.WriteLine("Склоняю полное имя с указанием фамилии, имени и отчества отдельно.");
+                CyrResult result = cyrName.Decline("Петров", "Сергей", "Витальевич");
+                WriteToConsole(result.Nominative, result);
+            }
+
+            {
+                Console.WriteLine("Склоняю полное имя в сокращенном варианте с указанием фамилии, имени и отчества отдельно.");
+                CyrResult result = cyrName.Decline("Петров", "С.", "В.");
+                WriteToConsole(result.Nominative, result);
+            }
+
+            {
+                string name = "Семенова Дарья Николаевна";
+                Console.WriteLine("Склоняю полное имя с указанием всего имени одной строкой.");
+                CyrResult result = cyrName.Decline(name);
+                WriteToConsole(name, result);
+            }
+
+            {
+                string name = "Семенова Д. Н.";
+                Console.WriteLine("Склоняю полное имя в сокращенном варианте с указанием всего имени одной строкой.");
+                CyrResult result = cyrName.Decline(name);
+                WriteToConsole(name, result);
+            }
+
+            {
+                string name = "Семенова Дарья Николаевна";
+                Console.WriteLine("Склоняю и сокращаю полное имя с указанием всего имени одной строкой.");
+                CyrResult result = cyrName.Decline(name, shorten: true);
+                WriteToConsole(name, result);
+            }
+
+            {
+                string name = "Петров Сергей Витальевич";
+                Console.WriteLine("Склоняю полное имя в определенный падеж.");
+                CyrNameResult result = cyrName.Decline(name, CasesEnum.Prepositional);
+                WriteToConsole(name, CyrDeclineCase.Prepositional, result);
+            }
+
+            {
+                string name = "Семенова Дарья";
+                Console.WriteLine("Склоняю неполное имя в определенный падеж.");
+                CyrNameResult result = cyrName.Decline(name, CasesEnum.Genitive);
+                WriteToConsole(name, CyrDeclineCase.Genitive, result);
             }
         }
 
@@ -189,6 +247,18 @@ namespace Cyriller.Samples
             Console.WriteLine(phrase);
             Console.Write(" - ");
             Console.WriteLine(string.Join(", ", result.ToArray()));
+            Console.WriteLine();
+        }
+
+        static void WriteToConsole(string name, CyrDeclineCase @case, CyrNameResult result)
+        {
+            Console.WriteLine(name);
+            Console.Write(" - ");
+            Console.Write(@case.NameRu);
+            Console.Write(", ");
+            Console.Write(@case.Description);
+            Console.Write(": ");
+            Console.WriteLine(result.ToString());
             Console.WriteLine();
         }
     }
