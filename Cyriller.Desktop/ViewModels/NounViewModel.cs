@@ -16,6 +16,7 @@ namespace Cyriller.Desktop.ViewModels
 
         protected bool isManualCaseGenderNumberInput = false;
         protected bool isDeclineResultVisible = false;
+        protected string searchResultTitle = null;
 
         public NounViewModel()
         {
@@ -56,6 +57,11 @@ namespace Cyriller.Desktop.ViewModels
         {
             get => this.isManualCaseGenderNumberInput;
             set => this.RaiseAndSetIfChanged(ref this.isManualCaseGenderNumberInput, value);
+        }
+        public string SearchResultTitle
+        {
+            get => this.searchResultTitle;
+            set => this.RaiseAndSetIfChanged(ref this.searchResultTitle, value);
         }
         public List<NounDeclineResultRowModel> DeclineResult { get; protected set; }
         public List<KeyValuePair<string, string>> NounProperties { get; protected set; }
@@ -101,6 +107,7 @@ namespace Cyriller.Desktop.ViewModels
             if (noun == null)
             {
                 this.IsDeclineResultVisible = false;
+                this.SearchResultTitle = $"По запросу \"{this.InputText}\" ничего не найдено";
                 return;
             }
 
@@ -132,6 +139,7 @@ namespace Cyriller.Desktop.ViewModels
 
             this.NounProperties.Add(new KeyValuePair<string, string>("Одушевленность", noun.IsAnimated ? "Одушевленный предмет" : "Неодушевленный предмет"));
             this.IsDeclineResultVisible = true;
+            this.SearchResultTitle = $"Результат поиска по запросу \"{this.InputText}\"";
         }
 
         public async Task InitCyrNounCollection()
