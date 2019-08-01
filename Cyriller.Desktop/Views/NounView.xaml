@@ -1,0 +1,61 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="450"
+             x:Class="Cyriller.Desktop.Views.NounView">
+  <DockPanel MinWidth="1000">
+    <StackPanel Margin="10">
+      <TextBlock FontWeight="Bold" FontSize="16" Margin="5">Поиск существительного</TextBlock>
+      <Grid RowDefinitions="Auto" ColumnDefinitions="*,200">
+        <TextBox Text="{Binding InputText}" Grid.Column="0" Margin="5" Name="txtInputText"></TextBox>
+        <Button Command="{Binding ButtonSearch_Click}" Grid.Column="1" Margin="5" IsDefault="True">Склонять</Button>
+      </Grid>
+      <Grid RowDefinitions="Auto" ColumnDefinitions="Auto,Auto,Auto,Auto,Auto">
+        <CheckBox Grid.Column="0" Margin="5" ToolTip.Tip="Только слова из словаря" IsChecked="{Binding IsStrictSearch}">Точное совпадение</CheckBox>
+        <CheckBox Grid.Column="1" Margin="5" ToolTip.Tip="Вручную указать род, падеж и число существительного" IsChecked="{Binding IsManualCaseGenderNumberInput}">Указать род, падеж, число</CheckBox>
+        <DropDown Margin="5" SelectionMode="AlwaysSelected" Grid.Column="2" IsEnabled="{Binding IsManualCaseGenderNumberInput}" Items="{Binding Genders}" SelectedItem="{Binding InputGender}">
+          <DropDown.ItemTemplate>
+            <DataTemplate>
+              <TextBlock Text="{Binding Value}" />
+            </DataTemplate>
+          </DropDown.ItemTemplate>
+        </DropDown>
+        <DropDown Margin="5" SelectionMode="AlwaysSelected" Grid.Column="3" IsEnabled="{Binding IsManualCaseGenderNumberInput}" Items="{Binding Cases}" SelectedItem="{Binding InputCase}">
+          <DropDown.ItemTemplate>
+            <DataTemplate>
+              <TextBlock Text="{Binding NameRu}"></TextBlock>
+            </DataTemplate>
+          </DropDown.ItemTemplate>
+        </DropDown>
+        <DropDown Margin="5" SelectionMode="AlwaysSelected" Grid.Column="4" IsEnabled="{Binding IsManualCaseGenderNumberInput}" Items="{Binding Numbers}" SelectedItem="{Binding InputNumber}">
+          <DropDown.ItemTemplate>
+            <DataTemplate>
+              <TextBlock Text="{Binding Value}"></TextBlock>
+            </DataTemplate>
+          </DropDown.ItemTemplate>
+        </DropDown>
+      </Grid>
+      <StackPanel IsVisible="{Binding IsDeclineResultVisible}">
+        <Panel Height="10"></Panel>
+        <TextBlock FontWeight="Bold" FontSize="14" Grid.Column="0" Grid.Row="0" Margin="5">Результат поиска</TextBlock>
+        <DataGrid Items="{Binding NounProperties}" HeadersVisibility="None">
+          <DataGrid.Columns>
+            <DataGridTextColumn Binding="{Binding Key}"></DataGridTextColumn>
+            <DataGridTextColumn Binding="{Binding Value}"></DataGridTextColumn>
+          </DataGrid.Columns>
+        </DataGrid>
+        <Panel Height="10"></Panel>
+        <TextBlock FontWeight="Bold" FontSize="14" Grid.Column="0" Grid.Row="0" Margin="5">Формы слова</TextBlock>
+        <DataGrid Items="{Binding DeclineResult}">
+          <DataGrid.Columns>
+            <DataGridTextColumn Header="Падеж" Binding="{Binding CaseName}"></DataGridTextColumn>
+            <DataGridTextColumn Header="" Binding="{Binding CaseDescription}"></DataGridTextColumn>
+            <DataGridTextColumn Header="Единственное число" Binding="{Binding Singular}"></DataGridTextColumn>
+            <DataGridTextColumn Header="Множественное число" Binding="{Binding Plural}"></DataGridTextColumn>
+          </DataGrid.Columns>
+        </DataGrid>
+      </StackPanel>
+    </StackPanel>
+  </DockPanel>
+</UserControl>

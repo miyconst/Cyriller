@@ -1,0 +1,34 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:Cyriller.Desktop.ViewModels;assembly=Cyriller.Desktop"
+        xmlns:views="clr-namespace:Cyriller.Desktop.Views;assembly=Cyriller.Desktop"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="Cyriller.Desktop.Views.MainWindow"
+        Icon="/Assets/favicon.ico"
+        Title="{Binding Title}">
+  <Design.DataContext>
+    <vm:MainWindowViewModel/>
+  </Design.DataContext>
+  <Grid RowDefinitions="Auto,Auto">
+    <Menu Grid.Row="0">
+      <MenuItem Header="Кириллер">
+        <MenuItem Header="Выход (Ctrl + Q)" HotKey="Ctrl+Q" Command="{Binding MenuItem_Exit_Click}"></MenuItem>
+      </MenuItem>
+      <MenuItem Header="Склонять">
+        <MenuItem Header="Существительное (Ctrl + Shift + N)" Command="{Binding MenuItem_Decline_Noun_Click}" HotKey="Ctrl+Shift+N"></MenuItem>
+        <MenuItem Header="Прилагательное"></MenuItem>
+        <MenuItem Header="Словосочетание"></MenuItem>
+        <MenuItem Header="Число"></MenuItem>
+        <MenuItem Header="Имя"></MenuItem>
+      </MenuItem>
+      <MenuItem Header="О Программе">
+        <MenuItem Header="Контакты"></MenuItem>
+      </MenuItem>
+    </Menu>
+    <StackPanel Grid.Row="1" IsVisible="{Binding IsNounViewVisible}">
+      <views:NounView DataContext="{Binding NounViewModel}" />
+    </StackPanel>
+  </Grid>
+</Window>
