@@ -10,35 +10,39 @@ namespace Cyriller.Samples
         private static CyrAdjectiveCollection cyrAdjectiveCollection;
         private static CyrPhrase cyrPhrase;
         private static CyrName cyrName = new CyrName();
+        private static CyrNumber cyrNumber = new CyrNumber();
 
         static void Main(string[] args)
         {
             Console.OutputEncoding = Encoding.UTF8;
 
-            Console.WriteLine("Загружаю словарь существительных.");
+            Console.WriteLine("# Загружаю словарь существительных.");
             cyrNounCollection = new CyrNounCollection();
 
-            Console.WriteLine("Загружаю словарь прилагательных.");
+            Console.WriteLine("# Загружаю словарь прилагательных.");
             cyrAdjectiveCollection = new CyrAdjectiveCollection();
 
             cyrPhrase = new CyrPhrase(cyrNounCollection, cyrAdjectiveCollection);
-            cyrName = new CyrName();
 
-            Console.WriteLine("Склоняю существительные.");
+            Console.WriteLine("# Склоняю существительные.");
             Console.WriteLine();
             NounSamples();
 
-            Console.WriteLine("Склоняю прилагательные.");
+            Console.WriteLine("# Склоняю прилагательные.");
             Console.WriteLine();
             AdjectiveSamples();
 
-            Console.WriteLine("Склоняю словосочетания.");
+            Console.WriteLine("# Склоняю словосочетания.");
             Console.WriteLine();
             PhraseSamples();
 
-            Console.WriteLine("Склоняю имена без использования словаря.");
+            Console.WriteLine("# Склоняю имена без использования словаря.");
             Console.WriteLine();
             NameSamples();
+
+            Console.WriteLine("# Склоняю числа, количества и суммы прописью.");
+            Console.WriteLine();
+            NumberSamples();
         }
 
         static void NounSamples()
@@ -164,6 +168,71 @@ namespace Cyriller.Samples
             }
         }
 
+        static void NumberSamples()
+        {
+            {
+                long value = short.MaxValue;
+                Console.WriteLine("Склоняю число прописью в мужском роде для неодушевленных предметов.");
+                CyrResult result = cyrNumber.Decline(value);
+                WriteToConsole(value.ToString(), result);
+            }
+
+            {
+                long value = ushort.MaxValue;
+                Console.WriteLine("Склоняю число прописью в указанном роде и одушевленности.");
+                CyrResult result = cyrNumber.Decline(value, GendersEnum.Feminine, AnimatesEnum.Animated);
+                WriteToConsole(value.ToString(), result);
+            }
+
+            {
+                decimal value = (decimal)ushort.MaxValue / 100;
+                Console.WriteLine("Склоняю денежную сумму в рублях.");
+                CyrResult result = cyrNumber.Decline(value, new CyrNumber.RurCurrency());
+                WriteToConsole(value.ToString(), result);
+            }
+
+            {
+                decimal value = (decimal)short.MaxValue / 100;
+                Console.WriteLine("Склоняю денежную сумму в евро.");
+                CyrResult result = cyrNumber.Decline(value, new CyrNumber.EurCurrency());
+                WriteToConsole(value.ToString(), result);
+            }
+
+            {
+                decimal value = short.MaxValue;
+                Console.WriteLine("Склоняю количество котов.");
+                CyrNoun cat = cyrNounCollection.Get("кот", out CasesEnum _, out NumbersEnum _);
+                CyrResult result = cyrNumber.Decline(value, new CyrNumber.Item(cat));
+                WriteToConsole($"{value.ToString()}, {cat.Name}", result);
+            }
+
+            {
+                decimal value = (decimal)short.MaxValue / 100;
+                Console.WriteLine("Склоняю число прописью в указнный падеж мужского рода для неодушевленных предметов.");
+                string result = cyrNumber.ToString(value, CasesEnum.Instrumental);
+                WriteToConsole(value.ToString(), CyrDeclineCase.Instrumental, result);
+            }
+
+            {
+                long value = ushort.MaxValue;
+                Console.WriteLine("Склоняет число прописью с указннием падежа, рода и одушевленности.");
+                string result = cyrNumber.ToString(value, CasesEnum.Instrumental, GendersEnum.Feminine, AnimatesEnum.Animated);
+                WriteToConsole(value.ToString(), CyrDeclineCase.Instrumental, result);
+            }
+
+            {
+                Console.WriteLine("Выбираю правильный вариант слова в зависимости от указанного числа.");
+
+                for (int i = 0; i < 10; i++)
+                {
+                    string result = cyrNumber.Case(i, "год", "года", "лет");
+                    Console.WriteLine($" - {i} {result}");
+                }
+
+                Console.WriteLine();
+            }
+        }
+
         static void WriteToConsole(CyrNoun noun, string foundWord = null)
         {
             Console.WriteLine($"{noun.Name}");
@@ -252,13 +321,18 @@ namespace Cyriller.Samples
 
         static void WriteToConsole(string name, CyrDeclineCase @case, CyrNameResult result)
         {
+            WriteToConsole(name, @case, result.ToString());
+        }
+
+        static void WriteToConsole(string name, CyrDeclineCase @case, string result)
+        {
             Console.WriteLine(name);
             Console.Write(" - ");
             Console.Write(@case.NameRu);
             Console.Write(", ");
             Console.Write(@case.Description);
             Console.Write(": ");
-            Console.WriteLine(result.ToString());
+            Console.WriteLine(result);
             Console.WriteLine();
         }
     }
