@@ -3,11 +3,74 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Cyriller.Model;
 
 namespace Cyriller
 {
     public class CyrName
     {
+        /// <summary>
+        /// Склоняет полное имя в указанный падеж.
+        /// </summary>
+        /// <param name="surname">Фамилия, в именительном падеже.</param>
+        /// <param name="name">Имя, в именительном падеже.</param>
+        /// <param name="patronymic">Отчество, в именительном падеже.</param>
+        /// <param name="@case">Падеж, в который нужно просклонять.</param>
+        /// <param name="gender">Пол, указанного имени, где <see cref="GendersEnum.Undefined"/> – определить автоматически.</param>
+        /// <param name="shorten">Сократить ли имя и отчество в результате склонения. К примеру, Иванов Иван Иванович, будет Иванов И. И.</param>
+        /// <returns>Возвращает результат склонения в виде <see cref="CyrNameResult"/>.</returns>
+        public virtual CyrNameResult Decline(string surname, string name, string patronymic, CasesEnum @case, GendersEnum gender = GendersEnum.Undefined, bool shorten = false)
+        {
+            string[] values = this.Decline(surname, name, patronymic, (int)@case, (int)gender, shorten);
+            CyrNameResult result = new CyrNameResult(values);
+
+            return result;
+        }
+
+        /// <summary>
+        /// Склоняет полное имя в указанный падеж.
+        /// </summary>
+        /// <param name="fullName">Полное имя, в именительном падеже.</param>
+        /// <param name="case">Падеж, в который нужно просклонять.</param>
+        /// <param name="gender">Пол, указанного имени, где <see cref="GendersEnum.Undefined"/> – определить автоматически.</param>
+        /// <param name="shorten">Сократить ли имя и отчество в результате склонения. К примеру, Иванов Иван Иванович, будет Иванов И. И.</param>
+        /// <returns>Возвращает результат склонения в виде <see cref="CyrNameResult"/>.</returns>
+        public virtual CyrNameResult Decline(string fullName, CasesEnum @case, GendersEnum gender = GendersEnum.Undefined, bool shorten = false)
+        {
+            string[] values = this.Decline(fullName, (int)@case, (int)gender, shorten);
+            CyrNameResult result = new CyrNameResult(values);
+
+            return result;
+        }
+
+        /// <summary>
+        /// Склоняет полное имя во все возможные падежи.
+        /// </summary>
+        /// <param name="surname">Фамилия, в именительном падеже.</param>
+        /// <param name="name">Имя, в именительном падеже.</param>
+        /// <param name="patronymic">Отчество, в именительном падеже.</param>
+        /// <param name="gender">Пол, указанного имени, где <see cref="GendersEnum.Undefined"/> – определить автоматически.</param>
+        /// <param name="shorten">Сократить ли имя и отчество в результате склонения. К примеру, Иванов Иван Иванович, будет Иванов И. И.</param>
+        /// <returns>Возвращает результат склонения в виде <see cref="CyrResult"/>.</returns>
+        public virtual CyrResult Decline(string surname, string name, string patronymic, GendersEnum gender = GendersEnum.Undefined, bool shorten = false)
+        {
+            CyrResult result = this.DeclinePerCaseAndCombine(caseIndex => this.Decline(surname, name, patronymic, caseIndex, (int)gender, shorten));
+            return result;
+        }
+
+        /// <summary>
+        /// Склоняет полное имя во все возможные падежи.
+        /// </summary>
+        /// <param name="fullName">Полное имя, в именительном падеже.</param>
+        /// <param name="gender">Пол, указанного имени, где <see cref="GendersEnum.Undefined"/> – определить автоматически.</param>
+        /// <param name="shorten">Сократить ли имя и отчество в результате склонения. К примеру, Иванов Иван Иванович, будет Иванов И. И.</param>
+        /// <returns>Возвращает результат склонения в виде <see cref="CyrResult"/>.</returns>
+        public virtual CyrResult Decline(string fullName, GendersEnum gender = GendersEnum.Undefined, bool shorten = false)
+        {
+            CyrResult result = this.DeclinePerCaseAndCombine(caseIndex => this.Decline(fullName, caseIndex, (int)gender, shorten));
+            return result;
+        }
+
         /// <summary>
         /// Склоняет полное имя в указанный падеж.
         /// </summary>
@@ -18,7 +81,7 @@ namespace Cyriller
         /// <param name="inputGender">Пол, указанного имени, где 0 – определить автоматически, 1 – мужской, 2 – женский.</param>
         /// <param name="inputShorten">Сократить ли имя и отчество в результате склонения. К примеру, Иванов Иван Иванович, будет Иванов И. И.</param>
         /// <returns>Возвращает результат склонения в виде массива из трех элементов [Фамилия, Имя, Отчество].</returns>
-        public string[] Decline(string inputSurname, string inputName, string inputPatronymic, int inputCase = 1, int inputGender = 0, bool inputShorten = false)
+        public virtual string[] Decline(string inputSurname, string inputName, string inputPatronymic, int inputCase, int inputGender = 0, bool inputShorten = false)
         {
             string temp = null;
             int caseNumber = 0;
@@ -94,6 +157,13 @@ namespace Cyriller
 
             switch (caseNumber)
             {
+                case 1:
+                    if (inputShorten)
+                    {
+                        name = this.Shorten(name);
+                        patronymic = this.Shorten(patronymic);
+                    }
+                    break;
                 case 2:
                     name = this.DeclineNameGenitive(name, isFeminine, inputShorten);
                     patronymic = this.DeclinePatronymicGenitive(patronymic, patronymicAfter, isFeminine, inputShorten);
@@ -135,30 +205,30 @@ namespace Cyriller
         /// <param name="case">Падеж, в который нужно просклонять, где 1 – именительный, 2 – родительный, 3 – дательный, 4 – винительный, 5 – творительный, 6 – предложный.</param>
         /// <param name="gender">Пол, указанного имени, где 0 – определить автоматически, 1 – мужской, 2 – женский.</param>
         /// <param name="shorten">Сократить ли имя и отчество в результате склонения. К примеру, Иванов Иван Иванович, будет Иванов И. И.</param>
-        /// <returns>Возвращает результат склонения.</returns>
-        public string Decline(string fullName, int @case = 1, int gender = 0, bool shorten = false)
+        /// <returns>Возвращает результат склонения в виде массива из трех элементов [Фамилия, Имя, Отчество].</returns>
+        public virtual string[] Decline(string fullName, int @case, int gender = 0, bool shorten = false)
         {
-            string strF = null;
-            string strI = null;
-            string strO = null;
+            string surname = null;
+            string name = null;
+            string patronymic = null;
             string str1 = null;
             string str2 = null;
             string str3 = null;
-            int iInd = 0;
+            int spaceIndex = 0;
 
-            iInd = fullName.IndexOf(" ");
+            spaceIndex = fullName.IndexOf(" ");
 
-            if (iInd > 0)
+            if (spaceIndex > 0)
             {
-                str1 = fullName.Substring(0, iInd).Trim().ToLower();
-                fullName = fullName.Substring(iInd).Trim();
+                str1 = fullName.Substring(0, spaceIndex).Trim().ToLower();
+                fullName = fullName.Substring(spaceIndex).Trim();
 
-                iInd = fullName.IndexOf(" ");
+                spaceIndex = fullName.IndexOf(" ");
 
-                if (iInd > 0)
+                if (spaceIndex > 0)
                 {
-                    str2 = fullName.Substring(0, iInd).Trim().ToLower();
-                    str3 = fullName.Substring(iInd).Trim().ToLower();
+                    str2 = fullName.Substring(0, spaceIndex).Trim().ToLower();
+                    str3 = fullName.Substring(spaceIndex).Trim().ToLower();
                 }
                 else
                 {
@@ -174,32 +244,32 @@ namespace Cyriller
             {
                 if (str2.EndsWith("ич") || str2.EndsWith("вна") || str2.EndsWith("чна"))
                 {
-                    strF = this.ProperCase(str3);
-                    strI = this.ProperCase(str1);
-                    strO = this.ProperCase(str2);
+                    surname = this.ProperCase(str3);
+                    name = this.ProperCase(str1);
+                    patronymic = this.ProperCase(str2);
                 }
                 else
                 {
-                    strF = this.ProperCase(str1);
-                    strI = this.ProperCase(str2);
-                    strO = this.ProperCase(str3);
+                    surname = this.ProperCase(str1);
+                    name = this.ProperCase(str2);
+                    patronymic = this.ProperCase(str3);
                 }
             }
             else
             {
                 if (str2.EndsWith("ич") || str2.EndsWith("вна") || str2.EndsWith("чна"))
                 {
-                    strI = this.ProperCase(str1); ;
-                    strO = this.ProperCase(str2);
+                    name = this.ProperCase(str1); ;
+                    patronymic = this.ProperCase(str2);
                 }
                 else
                 {
-                    strF = this.ProperCase(str1);
-                    strI = this.ProperCase(str2);
+                    surname = this.ProperCase(str1);
+                    name = this.ProperCase(str2);
                 }
             }
 
-            return string.Join(" ", Decline(strF, strI, strO, @case, gender, shorten));
+            return Decline(surname, name, patronymic, @case, gender, shorten);
         }
 
         /// <summary>
@@ -209,18 +279,18 @@ namespace Cyriller
         /// <param name="isFeminine">True, для женских имен.</param>
         /// <param name="shorten">Сократить ли имя, к примеру, Иван будет И.</param>
         /// <returns>Возвращает результат склонения.</returns>
-        public string DeclineNameGenitive(string name, bool isFeminine, bool shorten)
+        public virtual string DeclineNameGenitive(string name, bool isFeminine, bool shorten)
         {
             string temp;
 
-            if (name.Length <= 1 || name.EndsWith("."))
+            if (this.IsShorten(name))
             {
                 return name;
             }
 
             if (shorten)
             {
-                name = name.Substring(0, 1) + ".";
+                name = this.Shorten(name);
             }
             else
             {
@@ -299,18 +369,18 @@ namespace Cyriller
         /// <param name="isFeminine">True, для женских имен.</param>
         /// <param name="shorten">Сократить ли имя, к примеру, Иван будет И.</param>
         /// <returns>Возвращает результат склонения.</returns>
-        public string DeclineNameDative(string name, bool isFeminine, bool shorten)
+        public virtual string DeclineNameDative(string name, bool isFeminine, bool shorten)
         {
             string temp;
 
-            if (name.Length <= 1 || name.EndsWith("."))
+            if (this.IsShorten(name))
             {
                 return name;
             }
 
             if (shorten)
             {
-                name = name.Substring(0, 1) + ".";
+                name = this.Shorten(name);
             }
             else
             {
@@ -383,18 +453,18 @@ namespace Cyriller
         /// <param name="isFeminine">True, для женских имен.</param>
         /// <param name="shorten">Сократить ли имя, к примеру, Иван будет И.</param>
         /// <returns>Возвращает результат склонения.</returns>
-        public string DeclineNameAccusative(string name, bool isFeminine, bool shorten)
+        public virtual string DeclineNameAccusative(string name, bool isFeminine, bool shorten)
         {
             string temp;
 
-            if (name.Length <= 1 || name.EndsWith("."))
+            if (this.IsShorten(name))
             {
                 return name;
             }
 
             if (shorten)
             {
-                name = name.Substring(0, 1) + ".";
+                name = this.Shorten(name);
             }
             else
             {
@@ -467,18 +537,18 @@ namespace Cyriller
         /// <param name="isFeminine">True, для женских имен.</param>
         /// <param name="shorten">Сократить ли имя, к примеру, Иван будет И.</param>
         /// <returns>Возвращает результат склонения.</returns>
-        public string DeclineNameInstrumental(string name, bool isFeminine, bool shorten)
+        public virtual string DeclineNameInstrumental(string name, bool isFeminine, bool shorten)
         {
             string temp;
 
-            if (name.Length <= 1 || name.EndsWith("."))
+            if (this.IsShorten(name))
             {
                 return name;
             }
 
             if (shorten)
             {
-                name = name.Substring(0, 1) + ".";
+                name = this.Shorten(name);
             }
             else
             {
@@ -557,18 +627,18 @@ namespace Cyriller
         /// <param name="isFeminine">True, для женских имен.</param>
         /// <param name="shorten">Сократить ли имя, к примеру, Иван будет И.</param>
         /// <returns>Возвращает результат склонения.</returns>
-        public string DeclineNamePrepositional(string name, bool isFeminine, bool shorten)
+        public virtual string DeclineNamePrepositional(string name, bool isFeminine, bool shorten)
         {
             string temp;
 
-            if (name.Length <= 1 || name.EndsWith("."))
+            if (this.IsShorten(name))
             {
                 return name;
             }
 
             if (shorten)
             {
-                name = name.Substring(0, 1) + ".";
+                name = this.Shorten(name);
             }
             else
             {
@@ -647,16 +717,16 @@ namespace Cyriller
         /// <param name="isFeminine">True, для женских отчеств.</param>
         /// <param name="shorten">Сократить ли отчество, к примеру, Иванович будет И.</param>
         /// <returns>Возвращает результат склонения.</returns>
-        public string DeclinePatronymicGenitive(string patronymic, string patronymicAfter, bool isFeminine, bool shorten)
+        public virtual string DeclinePatronymicGenitive(string patronymic, string patronymicAfter, bool isFeminine, bool shorten)
         {
-            if (patronymic.Length <= 1 || patronymic.EndsWith("."))
+            if (this.IsShorten(patronymic))
             {
                 return patronymic;
             }
 
             if (shorten)
             {
-                patronymic = patronymic.Substring(0, 1) + ".";
+                patronymic = this.Shorten(patronymic);
             }
             else
             {
@@ -705,16 +775,16 @@ namespace Cyriller
         /// <param name="isFeminine">True, для женских отчеств.</param>
         /// <param name="shorten">Сократить ли отчество, к примеру, Иванович будет И.</param>
         /// <returns>Возвращает результат склонения.</returns>
-        public string DeclinePatronymicDative(string patronymic, string patronymicAfter, bool isFeminine, bool shorten)
+        public virtual string DeclinePatronymicDative(string patronymic, string patronymicAfter, bool isFeminine, bool shorten)
         {
-            if (patronymic.Length <= 1 || patronymic.EndsWith("."))
+            if (this.IsShorten(patronymic))
             {
                 return patronymic;
             }
 
             if (shorten)
             {
-                patronymic = patronymic.Substring(0, 1) + ".";
+                patronymic = this.Shorten(patronymic);
             }
             else
             {
@@ -761,16 +831,16 @@ namespace Cyriller
         /// <param name="isFeminine">True, для женских отчеств.</param>
         /// <param name="shorten">Сократить ли отчество, к примеру, Иванович будет И.</param>
         /// <returns>Возвращает результат склонения.</returns>
-        public string DeclinePatronymicAccusative(string patronymic, string patronymicAfter, bool isFeminine, bool shorten)
+        public virtual string DeclinePatronymicAccusative(string patronymic, string patronymicAfter, bool isFeminine, bool shorten)
         {
-            if (patronymic.Length <= 1 || patronymic.EndsWith("."))
+            if (this.IsShorten(patronymic))
             {
                 return patronymic;
             }
 
             if (shorten)
             {
-                patronymic = patronymic.Substring(0, 1) + ".";
+                patronymic = this.Shorten(patronymic);
             }
             else
             {
@@ -818,18 +888,18 @@ namespace Cyriller
         /// <param name="isFeminine">True, для женских отчеств.</param>
         /// <param name="shorten">Сократить ли отчество, к примеру, Иванович будет И.</param>
         /// <returns>Возвращает результат склонения.</returns>
-        public string DeclinePatronymicInstrumental(string patronymic, string patronymicAfter, bool isFeminine, bool shorten)
+        public virtual string DeclinePatronymicInstrumental(string patronymic, string patronymicAfter, bool isFeminine, bool shorten)
         {
             string temp;
 
-            if (patronymic.Length <= 1 || patronymic.EndsWith("."))
+            if (this.IsShorten(patronymic))
             {
                 return patronymic;
             }
 
             if (shorten)
             {
-                patronymic = patronymic.Substring(0, 1) + ".";
+                patronymic = this.Shorten(patronymic);
             }
             else
             {
@@ -893,16 +963,16 @@ namespace Cyriller
         /// <param name="isFeminine">True, для женских отчеств.</param>
         /// <param name="shorten">Сократить ли отчество, к примеру, Иванович будет И.</param>
         /// <returns>Возвращает результат склонения.</returns>
-        public string DeclinePatronymicPrepositional(string patronymic, string patronymicAfter, bool isFeminine, bool shorten)
+        public virtual string DeclinePatronymicPrepositional(string patronymic, string patronymicAfter, bool isFeminine, bool shorten)
         {
-            if (patronymic.Length <= 1 || patronymic.EndsWith("."))
+            if (this.IsShorten(patronymic))
             {
                 return patronymic;
             }
 
             if (shorten)
             {
-                patronymic = patronymic.Substring(0, 1) + ".";
+                patronymic = this.Shorten(patronymic);
             }
             else
             {
@@ -944,7 +1014,7 @@ namespace Cyriller
         /// <param name="surname">Фамилия, для склонения.</param>
         /// <param name="isFeminine">True, для женских фамилий.</param>
         /// <returns>Возвращает результат склонения.</returns>
-        public string DeclineSurnameGenitive(string surname, bool isFeminine)
+        public virtual string DeclineSurnameGenitive(string surname, bool isFeminine)
         {
             string temp = surname;
             string end = null;
@@ -1171,7 +1241,7 @@ namespace Cyriller
         /// <param name="surname">Фамилия, для склонения.</param>
         /// <param name="isFeminine">True, для женских фамилий.</param>
         /// <returns>Возвращает результат склонения.</returns>
-        public string DeclineSurnameDative(string surname, bool isFeminine)
+        public virtual string DeclineSurnameDative(string surname, bool isFeminine)
         {
             string temp = surname;
             string end;
@@ -1389,7 +1459,7 @@ namespace Cyriller
         /// <param name="surname">Фамилия, для склонения.</param>
         /// <param name="isFeminine">True, для женских фамилий.</param>
         /// <returns>Возвращает результат склонения.</returns>
-        public string DeclineSurnameAccusative(string surname, bool isFeminine)
+        public virtual string DeclineSurnameAccusative(string surname, bool isFeminine)
         {
             string temp = surname;
             string end;
@@ -1588,7 +1658,7 @@ namespace Cyriller
         /// <param name="surname">Фамилия, для склонения.</param>
         /// <param name="isFeminine">True, для женских фамилий.</param>
         /// <returns>Возвращает результат склонения.</returns>
-        public string DeclineSurnameInstrumental(string surname, bool isFeminine)
+        public virtual string DeclineSurnameInstrumental(string surname, bool isFeminine)
         {
             string temp = surname;
             string end;
@@ -1829,7 +1899,7 @@ namespace Cyriller
         /// <param name="surname">Фамилия, для склонения.</param>
         /// <param name="isFeminine">True, для женских фамилий.</param>
         /// <returns>Возвращает результат склонения.</returns>
-        public string DeclineSurnamePrepositional(string surname, bool isFeminine)
+        public virtual string DeclineSurnamePrepositional(string surname, bool isFeminine)
         {
             string temp = surname;
             string end;
@@ -2048,7 +2118,7 @@ namespace Cyriller
         /// <param name="case">Падеж, в который нужно просклонять фамилию, где 1 – именительный, 2 – родительный, 3 – дательный, 4 – винительный, 5 – творительный, 6 – предложный.</param>
         /// <param name="isFeminine">True, для женских фамилий.</param>
         /// <returns>Возвращает результат склонения.</returns>
-        public string DeclineSurname(string surname, int @case, bool isFeminine)
+        public virtual string DeclineSurname(string surname, int @case, bool isFeminine)
         {
             string result = surname;
 
@@ -2063,7 +2133,7 @@ namespace Cyriller
                 case 2:
                     result = this.DeclineSurnameGenitive(surname, isFeminine);
                     break;
-                
+
                 case 3:
                     result = this.DeclineSurnameDative(surname, isFeminine);
                     break;
@@ -2084,7 +2154,7 @@ namespace Cyriller
             return result;
         }
 
-        protected string ProperCase(string value)
+        protected virtual string ProperCase(string value)
         {
             if (value != null)
             {
@@ -2101,17 +2171,17 @@ namespace Cyriller
             return char.ToUpper(value[0]) + value.Substring(1);
         }
 
-        protected string SetEnd(string value, string add)
+        protected virtual string SetEnd(string value, string add)
         {
             return SetEnd(value, add.Length, add);
         }
 
-        protected string SetEnd(string value, int cut, string add)
+        protected virtual string SetEnd(string value, int cut, string add)
         {
             return value.Substring(0, value.Length - cut) + add;
         }
 
-        protected string SubstringRight(string value, int cut)
+        protected virtual string SubstringRight(string value, int cut)
         {
             if (cut > value.Length)
             {
@@ -2119,6 +2189,67 @@ namespace Cyriller
             }
 
             return value.Substring(value.Length - cut);
+        }
+
+        /// <summary>
+        /// Вызывает предоставленную функцию для каждого падежа (<see cref="CyrDeclineCase.List"/>) и возвращает общий результат.
+        /// </summary>
+        /// <param name="decline">
+        /// Функция для склонения в определенном падеже.
+        /// Принимает <see cref="int"/> номер падежа. 
+        /// Возвращает результат склонения в виде массива из трех элементов [Фамилия, Имя, Отчество].
+        /// </param>
+        /// <returns>Возвращает результат склонения в виде <see cref="CyrResult"/>.</returns>
+        protected virtual CyrResult DeclinePerCaseAndCombine(Func<int, string[]> decline)
+        {
+            string[] cases = new string[6];
+
+            foreach (CyrDeclineCase @case in CyrDeclineCase.List)
+            {
+                int caseIndex = @case.Index;
+                string[] values = decline(caseIndex);
+                CyrNameResult caseResult = new CyrNameResult(values);
+
+                cases[caseIndex - 1] = caseResult.ToString();
+            }
+
+            CyrResult result = new CyrResult(cases);
+
+            return result;
+        }
+
+        /// <summary>
+        /// Сокращает указанное значение. Пример: "Петровна" -> "П.", "Николай" -> "Н.".
+        /// Возвращает null, если входное значение является пустой строкой или null.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        protected virtual string Shorten(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return null;
+            }
+
+            string result = new string(new char[] { value[0], '.' });
+
+            return result;
+        }
+
+        /// <summary>
+        /// Возвращает true, если входная строка является пустой, null или заканчивается на точку (.).
+        /// Пример: "Петровна" -> false, "Н." -> true.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        protected virtual bool IsShorten(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return true;
+            }
+
+            return value[value.Length - 1] == '.';
         }
     }
 }
