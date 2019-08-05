@@ -14,17 +14,32 @@
   <Grid RowDefinitions="Auto,Auto">
     <Menu Grid.Row="0">
       <MenuItem Header="Кириллер">
-        <MenuItem Header="Выход (Ctrl + Q)" HotKey="Ctrl+Q" Command="{Binding MenuItem_Exit_Click}"></MenuItem>
+        <MenuItem Header="О Программе (F1)" HotKey="F1">
+          <MenuItem.Icon>
+            <Image Source="/Assets/info-icon.png"></Image>
+          </MenuItem.Icon>
+        </MenuItem>
+        <MenuItem Header="-"></MenuItem>
+        <MenuItem Header="Выход (Ctrl + Q)" HotKey="Ctrl+Q" Command="{Binding MenuItem_Exit_Click}">
+          <MenuItem.Icon>
+            <Image Source="/Assets/exit-icon.png"></Image>
+          </MenuItem.Icon>
+        </MenuItem>
       </MenuItem>
       <MenuItem Header="Склонять">
-        <MenuItem Header="Существительное (Ctrl + Shift + N)" Command="{Binding MenuItem_Decline_Noun_Click}" HotKey="Ctrl+Shift+N"></MenuItem>
-        <MenuItem Header="Прилагательное"></MenuItem>
+        <MenuItem Header="Существительное (Ctrl + Shift + N)" Command="{Binding MenuItem_Decline_Noun_Click}" HotKey="Ctrl+Shift+N">
+          <MenuItem.Icon>
+            <Image Source="/Assets/noun-icon.png"></Image>
+          </MenuItem.Icon>
+        </MenuItem>
+        <MenuItem Header="Прилагательное (Ctrl + Shift + A)" HotKey="Ctrl+Shift+A">
+          <MenuItem.Icon>
+            <Image Source="/Assets/adj-icon.png"></Image>
+          </MenuItem.Icon>
+        </MenuItem>
         <MenuItem Header="Словосочетание"></MenuItem>
         <MenuItem Header="Число"></MenuItem>
         <MenuItem Header="Имя"></MenuItem>
-      </MenuItem>
-      <MenuItem Header="О Программе">
-        <MenuItem Header="Контакты"></MenuItem>
       </MenuItem>
     </Menu>
     <StackPanel Grid.Row="1" IsVisible="{Binding IsNounViewVisible}">
