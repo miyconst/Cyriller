@@ -55,6 +55,11 @@
             <DataGridTextColumn Header="Множественное число" Binding="{Binding Plural}"></DataGridTextColumn>
           </DataGrid.Columns>
         </DataGrid>
+        <Panel Height="10"></Panel>
+        <Grid ColumnDefinitions="Auto,Auto">
+          <Button Grid.Column="0" Name="btnExportToJson" Margin="0,0,10,0">Выгрузить в JSON</Button>
+          <Button Grid.Column="1" Name="btnExportToExcel">Выгрузить в MS-Excel</Button>
+        </Grid>
       </StackPanel>
     </StackPanel>
   </DockPanel>

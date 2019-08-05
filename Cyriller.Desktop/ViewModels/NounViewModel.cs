@@ -2,8 +2,12 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+using System.IO;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Avalonia.Controls;
 using ReactiveUI;
+using OfficeOpenXml;
 using Cyriller.Model;
 using Cyriller.Desktop.Models;
 
@@ -17,6 +21,7 @@ namespace Cyriller.Desktop.ViewModels
         protected bool isManualCaseGenderNumberInput = false;
         protected bool isDeclineResultVisible = false;
         protected string searchResultTitle = null;
+        protected string inputText = "кот";
 
         public NounViewModel()
         {
@@ -43,7 +48,21 @@ namespace Cyriller.Desktop.ViewModels
             this.InputNumber = this.Numbers.First();
         }
 
-        public string InputText { get; set; }
+        public string InputText
+        {
+            get => this.inputText;
+            set
+            {
+                this.NounProperties.Clear();
+                this.DeclineResult.Clear();
+
+                this.RaiseAndSetIfChanged(ref this.inputText, value);
+                this.RaisePropertyChanged(nameof(NounProperties));
+                this.RaisePropertyChanged(nameof(DeclineResult));
+                this.IsDeclineResultVisible = false;
+            }
+        }
+
         public KeyValuePair<GendersEnum, string> InputGender { get; set; }
         public CyrDeclineCase InputCase { get; set; }
         public KeyValuePair<NumbersEnum, string> InputNumber { get; set; }
@@ -130,14 +149,14 @@ namespace Cyriller.Desktop.ViewModels
                 this.NounProperties.Add(new KeyValuePair<string, string>("Слово в словаре", foundWord));
             }
 
-            this.NounProperties.Add(new KeyValuePair<string, string>("Род", noun.Gender.ToString()));
+            this.NounProperties.Add(new KeyValuePair<string, string>("Род", new GenderModel(noun.Gender).Name));
 
-            if (noun.WordType != 0)
+            if (noun.WordType != WordTypesEnum.None)
             {
-                this.NounProperties.Add(new KeyValuePair<string, string>("Тип слова", noun.WordType.ToString()));
+                this.NounProperties.Add(new KeyValuePair<string, string>("Тип слова", new WordTypeModel(noun.WordType).Name));
             }
 
-            this.NounProperties.Add(new KeyValuePair<string, string>("Одушевленность", noun.IsAnimated ? "Одушевленный предмет" : "Неодушевленный предмет"));
+            this.NounProperties.Add(new KeyValuePair<string, string>("Одушевленность", new AnimateModel(noun.Animate).Name));
             this.IsDeclineResultVisible = true;
             this.SearchResultTitle = $"Результат поиска по запросу \"{this.InputText}\"";
         }
@@ -159,6 +178,88 @@ namespace Cyriller.Desktop.ViewModels
             }
 
             await LoadCyrNounCollectionTask;
+        }
+
+        public async Task ExportToJson(string fileName)
+        {
+            FileInfo fi = new FileInfo(fileName);
+
+            if (fi.Exists)
+            {
+                fi.Delete();
+            }
+
+            object export = new
+            {
+                Word = this.InputText,
+                this.NounProperties,
+                this.DeclineResult
+            };
+
+            string json = JsonConvert.SerializeObject(export, Formatting.Indented);
+            StreamWriter writer = new StreamWriter(fileName, false, Encoding.UTF8);
+
+            await writer.WriteAsync(json);
+            writer.Dispose();
+        }
+
+        public async Task ExportToExcel(string fileName)
+        {
+            FileInfo fi = new FileInfo(fileName);
+
+            if (fi.Exists)
+            {
+                fi.Delete();
+            }
+
+            ExcelPackage package = new ExcelPackage();
+            ExcelWorksheet sheet = package.Workbook.Worksheets.Add(this.inputText);
+            int rowIndex = 1;
+
+            sheet.Cells[rowIndex++, 1].Value = this.inputText;
+            rowIndex++;
+
+            {
+                ExcelRange range = sheet.Cells[rowIndex, 1, rowIndex, 2];
+                range.Merge = true;
+                range.Value = "Свойства существительного";
+                rowIndex++;
+            }
+
+            foreach (KeyValuePair<string, string> property in this.NounProperties)
+            {
+                sheet.Cells[rowIndex, 1].Value = property.Key;
+                sheet.Cells[rowIndex, 2].Value = property.Value;
+                rowIndex++;
+            }
+
+            rowIndex++;
+
+            {
+                ExcelRange range = sheet.Cells[rowIndex, 1, rowIndex, 2];
+                range.Merge = true;
+                range.Value = "Падеж";
+
+                sheet.Cells[rowIndex, 3].Value = "Единственное число";
+                sheet.Cells[rowIndex, 4].Value = "Множественное число";
+                rowIndex++;
+            }
+
+            foreach (NounDeclineResultRowModel row in this.DeclineResult)
+            {
+                sheet.Cells[rowIndex, 1].Value = row.CaseName;
+                sheet.Cells[rowIndex, 2].Value = row.CaseDescription;
+                sheet.Cells[rowIndex, 3].Value = row.Singular;
+                sheet.Cells[rowIndex, 4].Value = row.Plural;
+                rowIndex++;
+            }
+
+            await Task.Run(() =>
+            {
+                sheet.Cells.AutoFitColumns();
+                package.SaveAs(fi);
+                package.Dispose();
+            });
         }
     }
 }
