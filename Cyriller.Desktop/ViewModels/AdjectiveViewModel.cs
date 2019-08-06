@@ -45,22 +45,35 @@ namespace Cyriller.Desktop.ViewModels
 
             CyrAdjective adj = null;
             string foundWord = null;
+            GendersEnum foundGender = GendersEnum.Undefined;
+            CasesEnum foundCase = CasesEnum.Nominative;
+            string foundCaseName = null;
+            NumbersEnum foundNumber = NumbersEnum.Singular;
+            AnimatesEnum foundAnimate = AnimatesEnum.Animated;
 
             if (this.IsStrictSearch && !this.IsManualPropertiesInput)
             {
-                adj = this.CyrAdjectiveCollection.GetOrDefault(this.InputText, out GendersEnum _, out CasesEnum _, out NumbersEnum _, out AnimatesEnum _);
+                adj = this.CyrAdjectiveCollection.GetOrDefault(this.InputText, out foundGender, out foundCase, out foundNumber, out foundAnimate);
             }
             else if (!this.IsStrictSearch && !this.IsManualPropertiesInput)
             {
-                adj = this.CyrAdjectiveCollection.GetOrDefault(this.InputText, out foundWord, out GendersEnum _, out CasesEnum _, out NumbersEnum _, out AnimatesEnum _);
+                adj = this.CyrAdjectiveCollection.GetOrDefault(this.InputText, out foundWord, out foundGender, out foundCase, out foundNumber, out foundAnimate);
             }
             else if (this.IsStrictSearch && this.IsManualPropertiesInput)
             {
-                adj = this.CyrAdjectiveCollection.GetOrDefault(this.InputText, this.InputGender.Value, this.InputCase.Value, this.InputNumber.Value, this.InputAnimate.Value);
+                foundGender = InputGender.Value;
+                foundCase = InputCase.Value;
+                foundNumber = InputNumber.Value;
+                foundAnimate = InputAnimate.Value;
+                adj = this.CyrAdjectiveCollection.GetOrDefault(this.InputText, foundGender, foundCase, foundNumber, foundAnimate);
             }
             else if (!this.IsStrictSearch && this.IsManualPropertiesInput)
             {
-                adj = this.CyrAdjectiveCollection.GetOrDefault(this.InputText, out foundWord, this.InputGender.Value, this.InputCase.Value, this.InputNumber.Value, this.InputAnimate.Value);
+                foundGender = InputGender.Value;
+                foundCase = InputCase.Value;
+                foundNumber = InputNumber.Value;
+                foundAnimate = InputAnimate.Value;
+                adj = this.CyrAdjectiveCollection.GetOrDefault(this.InputText, out foundWord, foundGender, foundCase, foundNumber, foundAnimate);
             }
 
             this.DeclineResult = new List<AdjectiveDeclineResultRowModel>();
@@ -100,6 +113,11 @@ namespace Cyriller.Desktop.ViewModels
 
             foreach (CyrDeclineCase @case in CyrDeclineCase.GetEnumerable())
             {
+                if (@case.Value == foundCase)
+                {
+                    foundCaseName = @case.NameRu;
+                }
+
                 AdjectiveDeclineResultRowModel row = new AdjectiveDeclineResultRowModel()
                 {
                     CaseName = @case.NameRu,
@@ -120,10 +138,11 @@ namespace Cyriller.Desktop.ViewModels
                 this.DeclineResult.Add(row);
             }
 
-            if (!string.IsNullOrWhiteSpace(foundWord) && !string.Equals(foundWord, adj.Name, StringComparison.InvariantCulture))
-            {
-                this.WordProperties.Add(new KeyValuePair<string, string>("Слово в словаре", foundWord));
-            }
+            this.WordProperties.Add(new KeyValuePair<string, string>("Слово в словаре", foundWord));
+            this.WordProperties.Add(new KeyValuePair<string, string>("Род", new GenderModel(foundGender).Name));
+            this.WordProperties.Add(new KeyValuePair<string, string>("Падеж", foundCaseName));
+            this.WordProperties.Add(new KeyValuePair<string, string>("Число", new NumberModel(foundNumber).Name));
+            this.WordProperties.Add(new KeyValuePair<string, string>("Одушевленность", new AnimateModel(foundAnimate).Name));
 
             this.IsDeclineResultVisible = true;
             this.SearchResultTitle = $"Результат поиска по запросу \"{this.InputText}\"";

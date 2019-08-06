@@ -48,22 +48,29 @@ namespace Cyriller.Desktop.ViewModels
 
             CyrNoun noun = null;
             string foundWord = null;
+            CasesEnum foundCase = CasesEnum.Nominative;
+            string foundCaseName = null;
+            NumbersEnum foundNumber = NumbersEnum.Singular;
 
             if (this.IsStrictSearch && !this.IsManualPropertiesInput)
             {
-                noun = CyrNounCollection.GetOrDefault(this.InputText, out CasesEnum _, out NumbersEnum _);
+                noun = CyrNounCollection.GetOrDefault(this.InputText, out foundCase, out foundNumber);
             }
             else if (!this.IsStrictSearch && !this.IsManualPropertiesInput)
             {
-                noun = CyrNounCollection.GetOrDefault(this.InputText, out foundWord, out CasesEnum _, out NumbersEnum _);
+                noun = CyrNounCollection.GetOrDefault(this.InputText, out foundWord, out foundCase, out foundNumber);
             }
             else if (this.IsStrictSearch && this.IsManualPropertiesInput)
             {
-                noun = CyrNounCollection.GetOrDefault(this.InputText, this.InputGender.Value, this.InputCase.Value, this.InputNumber.Value);
+                foundCase = this.InputCase.Value;
+                foundNumber = this.InputNumber.Value;
+                noun = CyrNounCollection.GetOrDefault(this.InputText, this.InputGender.Value, foundCase, foundNumber);
             }
             else if (!this.IsStrictSearch && this.IsManualPropertiesInput)
             {
-                noun = CyrNounCollection.GetOrDefault(this.InputText, out foundWord, this.InputGender.Value, this.InputCase.Value, this.InputNumber.Value);
+                foundCase = this.InputCase.Value;
+                foundNumber = this.InputNumber.Value;
+                noun = CyrNounCollection.GetOrDefault(this.InputText, out foundWord, this.InputGender.Value, foundCase, foundNumber);
             }
 
             this.DeclineResult = new List<NounDeclineResultRowModel>();
@@ -84,6 +91,11 @@ namespace Cyriller.Desktop.ViewModels
 
             foreach (CyrDeclineCase @case in CyrDeclineCase.GetEnumerable())
             {
+                if (@case.Value == foundCase)
+                {
+                    foundCaseName = @case.NameRu;
+                }
+
                 this.DeclineResult.Add(new NounDeclineResultRowModel()
                 {
                     CaseName = @case.NameRu,
@@ -93,19 +105,17 @@ namespace Cyriller.Desktop.ViewModels
                 });
             }
 
-            if (!string.IsNullOrWhiteSpace(foundWord) && !string.Equals(foundWord, noun.Name, StringComparison.InvariantCulture))
-            {
-                this.WordProperties.Add(new KeyValuePair<string, string>("Слово в словаре", foundWord));
-            }
-
+            this.WordProperties.Add(new KeyValuePair<string, string>("Слово в словаре", foundWord));
             this.WordProperties.Add(new KeyValuePair<string, string>("Род", new GenderModel(noun.Gender).Name));
+            this.WordProperties.Add(new KeyValuePair<string, string>("Падеж", foundCaseName));
+            this.WordProperties.Add(new KeyValuePair<string, string>("Число", new NumberModel(foundNumber).Name));
+            this.WordProperties.Add(new KeyValuePair<string, string>("Одушевленность", new AnimateModel(noun.Animate).Name));
 
             if (noun.WordType != WordTypesEnum.None)
             {
                 this.WordProperties.Add(new KeyValuePair<string, string>("Тип слова", new WordTypeModel(noun.WordType).Name));
             }
-
-            this.WordProperties.Add(new KeyValuePair<string, string>("Одушевленность", new AnimateModel(noun.Animate).Name));
+            
             this.IsDeclineResultVisible = true;
             this.SearchResultTitle = $"Результат поиска по запросу \"{this.InputText}\"";
         }
