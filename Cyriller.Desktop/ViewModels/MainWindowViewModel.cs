@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using Avalonia;
+using Avalonia.Input;
 using ReactiveUI;
 using Cyriller.Desktop.Models;
-using Cyriller.Desktop.Views;
 
 namespace Cyriller.Desktop.ViewModels
 {
@@ -14,6 +14,7 @@ namespace Cyriller.Desktop.ViewModels
         protected string title = "Cyriller Desktop";
         protected bool isNounViewVisible = false;
         protected bool isAdjectiveVisible = false;
+        protected Cursor cursor = Cursor.Default;
 
         public event EventHandler NounFormOpened;
         public event EventHandler AdjectiveFormOpened;
@@ -22,6 +23,12 @@ namespace Cyriller.Desktop.ViewModels
         {
             get => this.title;
             protected set => this.RaiseAndSetIfChanged(ref this.title, value);
+        }
+
+        public Cursor Cursor
+        {
+            get => this.cursor;
+            set => this.RaiseAndSetIfChanged(ref this.cursor, value);
         }
 
         public bool IsNounViewVisible
@@ -62,6 +69,8 @@ namespace Cyriller.Desktop.ViewModels
 
         public virtual async void MenuItem_Decline_Noun_Click()
         {
+            this.Busy();
+            this.Cursor = new Cursor(StandardCursorType.Wait);
             this.Title = "Склонение существительного по падежам";
             this.IsNounViewVisible = true;
             this.IsAdjectiveVisible = false;
@@ -76,10 +85,12 @@ namespace Cyriller.Desktop.ViewModels
             this.NounViewModel = Program.ServiceProvider.GetService<NounViewModel>();
             this.RaisePropertyChanged(nameof(NounViewModel));
             this.NounFormOpened?.Invoke(this, EventArgs.Empty);
+            this.Free();
         }
 
         public async virtual void MenuItem_Decline_Adjective_Click()
         {
+            this.Busy();
             this.Title = "Склонение прилагательного по падежам";
             this.IsNounViewVisible = false;
             this.IsAdjectiveVisible = true;
@@ -94,6 +105,17 @@ namespace Cyriller.Desktop.ViewModels
             this.AdjectiveViewModel = Program.ServiceProvider.GetService<AdjectiveViewModel>();
             this.RaisePropertyChanged(nameof(AdjectiveViewModel));
             this.AdjectiveFormOpened?.Invoke(this, EventArgs.Empty);
+            this.Free();
+        }
+
+        protected virtual void Busy()
+        {
+            this.Cursor = new Cursor(StandardCursorType.Wait);
+        }
+
+        protected virtual void Free()
+        {
+            this.Cursor = Cursor.Default;
         }
     }
 }

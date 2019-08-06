@@ -7,7 +7,7 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Cyriller.Desktop.Views.MainWindow"
         Icon="/Assets/favicon.ico"
-        Title="{Binding Title}">
+        Title="{Binding Title}" Cursor="{Binding Cursor}">
   <Grid RowDefinitions="Auto,Auto,Auto">
     <Menu Grid.Row="0">
       <MenuItem Header="Кириллер">
