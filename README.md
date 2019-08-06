@@ -141,7 +141,7 @@ dotnet run
 - Склоняет количество указанных единиц в указанный падеж.
 - Выбирает правильный вариант слова в зависимости от указанного числа (1 год, 2 года, 5 лет).
 
-Смотри пример использования классов `CyrNumber`, `CyrNumber.Currency` и `CyrNumber.Item` в методе [/Cyriller.Samples/Program.cs/NumberSamples](Cyriller.Samples/Program.cs#L171).
+Смотри пример использования классов `CyrNumber`, `CyrNumber.Currency` и `CyrNumber.Item` в методе [/Cyriller.Samples/Program.cs/NumberSamples](Cyriller.Samples/Program.cs#L169).
 
 ### Результат склонения
 

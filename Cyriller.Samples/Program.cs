@@ -118,8 +118,6 @@ namespace Cyriller.Samples
 
         static void NameSamples()
         {
-            CyrDeclineCase[] cases = CyrDeclineCase.List;
-
             {
                 Console.WriteLine("Склоняю полное имя с указанием фамилии, имени и отчества отдельно.");
                 CyrResult result = cyrName.Decline("Петров", "Сергей", "Витальевич");
