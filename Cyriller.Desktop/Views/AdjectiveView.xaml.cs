@@ -12,21 +12,23 @@ namespace Cyriller.Desktop.Views
             this.InitializeComponent();
         }
 
+        public new void Focus()
+        {
+            base.Focus();
+            this.FindControl<TextBox>("txtInputText").Focus();
+        }
+
+        protected override IControl GetTemplateFocusTarget()
+        {
+            return this.FindControl<TextBox>("txtInputText");
+        }
+
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
 
-            this.PropertyChanged += AdjectiveView_PropertyChanged;
             this.FindControl<Button>("btnExportToJson").Click += ButtonExportToJson_Click;
             this.FindControl<Button>("btnExportToExcel").Click += ButtonExportToExcel_Click;
-        }
-
-        private void AdjectiveView_PropertyChanged(object sender, AvaloniaPropertyChangedEventArgs e)
-        {
-            if (e.Property.Name == nameof(this.TransformedBounds))
-            {
-                this.FindControl<TextBox>("txtInputText")?.Focus();
-            }
         }
 
         private async void ButtonExportToJson_Click(object sender, Avalonia.Interactivity.RoutedEventArgs e)

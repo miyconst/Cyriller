@@ -18,21 +18,18 @@ namespace Cyriller.Desktop.Views
 
         public NounViewModel ViewModel => this.DataContext as NounViewModel;
 
+        public new void Focus()
+        {
+            base.Focus();
+            this.FindControl<TextBox>("txtInputText").Focus();
+        }
+
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
 
-            this.PropertyChanged += NounView_PropertyChanged;
             this.FindControl<Button>("btnExportToJson").Click += ButtonExportToJson_Click;
             this.FindControl<Button>("btnExportToExcel").Click += ButtonExportToExcel_Click;
-        }
-
-        private void NounView_PropertyChanged(object sender, AvaloniaPropertyChangedEventArgs e)
-        {
-            if (e.Property.Name == nameof(this.TransformedBounds))
-            {
-                this.FindControl<TextBox>("txtInputText")?.Focus();
-            }
         }
 
         private async void ButtonExportToJson_Click(object sender, Avalonia.Interactivity.RoutedEventArgs e)

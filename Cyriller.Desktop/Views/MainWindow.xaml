@@ -40,10 +40,10 @@
       </MenuItem>
     </Menu>
     <StackPanel Grid.Row="1" IsVisible="{Binding IsNounViewVisible}">
-      <views:NounView DataContext="{Binding NounViewModel}" />
+      <views:NounView DataContext="{Binding NounViewModel}" Name="ucNoun" />
     </StackPanel>
     <StackPanel Grid.Row="2" IsVisible="{Binding IsAdjectiveVisible}">
-      <views:AdjectiveView DataContext="{Binding AdjectiveViewModel}" />
+      <views:AdjectiveView DataContext="{Binding AdjectiveViewModel}" Name="ucAdjective" />
     </StackPanel>
   </Grid>
 </Window>

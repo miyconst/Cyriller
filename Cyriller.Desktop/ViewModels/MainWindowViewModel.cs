@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Microsoft.Extensions.DependencyInjection;
 using Avalonia;
 using ReactiveUI;
 using Cyriller.Desktop.Models;
+using Cyriller.Desktop.Views;
 
 namespace Cyriller.Desktop.ViewModels
 {
@@ -12,6 +14,9 @@ namespace Cyriller.Desktop.ViewModels
         protected string title = "Cyriller Desktop";
         protected bool isNounViewVisible = false;
         protected bool isAdjectiveVisible = false;
+
+        public event EventHandler NounFormOpened;
+        public event EventHandler AdjectiveFormOpened;
 
         public string Title
         {
@@ -22,7 +27,16 @@ namespace Cyriller.Desktop.ViewModels
         public bool IsNounViewVisible
         {
             get => this.isNounViewVisible;
-            set => this.RaiseAndSetIfChanged(ref this.isNounViewVisible, value);
+            set
+            {
+                if (!value)
+                {
+                    this.NounViewModel = null;
+                    this.RaisePropertyChanged(nameof(this.NounViewModel));
+                }
+
+                this.RaiseAndSetIfChanged(ref this.isNounViewVisible, value);
+            }
         }
 
         public bool IsAdjectiveVisible
@@ -35,9 +49,9 @@ namespace Cyriller.Desktop.ViewModels
         public NounViewModel NounViewModel { get; protected set; }
         public AdjectiveViewModel AdjectiveViewModel { get; protected set; }
 
-        public MainWindowViewModel()
+        public MainWindowViewModel(CyrCollectionContainer container)
         {
-            this.CyrCollectionContainer = new CyrCollectionContainer();
+            this.CyrCollectionContainer = container ?? throw new ArgumentNullException(nameof(container));
             this.CyrCollectionContainer.InitCollectionsInBackground();
         }
 
@@ -59,8 +73,9 @@ namespace Cyriller.Desktop.ViewModels
 
             await this.CyrCollectionContainer.InitOrDefault();
 
-            this.NounViewModel = new NounViewModel(this.CyrCollectionContainer);
+            this.NounViewModel = Program.ServiceProvider.GetService<NounViewModel>();
             this.RaisePropertyChanged(nameof(NounViewModel));
+            this.NounFormOpened?.Invoke(this, EventArgs.Empty);
         }
 
         public async virtual void MenuItem_Decline_Adjective_Click()
@@ -75,9 +90,10 @@ namespace Cyriller.Desktop.ViewModels
             }
 
             await this.CyrCollectionContainer.InitOrDefault();
-            
-            this.AdjectiveViewModel = new AdjectiveViewModel(this.CyrCollectionContainer);
+
+            this.AdjectiveViewModel = Program.ServiceProvider.GetService<AdjectiveViewModel>();
             this.RaisePropertyChanged(nameof(AdjectiveViewModel));
+            this.AdjectiveFormOpened?.Invoke(this, EventArgs.Empty);
         }
     }
 }
