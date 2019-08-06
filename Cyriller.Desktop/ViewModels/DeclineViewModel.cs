@@ -5,11 +5,14 @@ using System.Linq;
 using System.IO;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input.Platform;
 using ReactiveUI;
 using OfficeOpenXml;
 using Cyriller.Model;
 using Cyriller.Desktop.Models;
+using Cyriller.Desktop.Views;
 
 namespace Cyriller.Desktop.ViewModels
 {
@@ -19,6 +22,14 @@ namespace Cyriller.Desktop.ViewModels
         protected bool isDeclineResultVisible = false;
         protected string searchResultTitle = null;
         protected string inputText;
+
+        public Application Application { get; protected set; }
+        public IClipboard Clipboard => Application.Clipboard;
+
+        public DeclineViewModel(Application application)
+        {
+            this.Application = application ?? throw new ArgumentNullException(nameof(application));
+        }
 
         #region DropDown options.
         public List<GenderModel> Genders { get; protected set; }
@@ -84,9 +95,69 @@ namespace Cyriller.Desktop.ViewModels
         }
 
         #region Export methods.
-        public abstract Task ExportToJson(string fileName);
+        protected abstract string GetExportJsonString();
+        protected abstract void FillExportExcelPackage(ExcelPackage package);
 
-        public abstract Task ExportToExcel(string fileName);
+        public virtual async void ExportToClipboard()
+        {
+            string json = this.GetExportJsonString();
+            await this.Clipboard.SetTextAsync(json);
+        }
+
+        public virtual async void ExportToJson()
+        {
+            string fileName = await this.Application.MainWindow.SaveFileDialog("Сохранить результат склонения в JSON", "json", "Файлы JSON");
+
+            if (string.IsNullOrEmpty(fileName))
+            {
+                return;
+            }
+
+            FileInfo fi = new FileInfo(fileName);
+
+            if (fi.Exists)
+            {
+                fi.Delete();
+            }
+
+            string json = this.GetExportJsonString();
+            StreamWriter writer = new StreamWriter(fileName, false, Encoding.UTF8);
+
+            await writer.WriteAsync(json);
+            writer.Dispose();
+        }
+
+        public virtual async void ExportToExcel()
+        {
+            string fileName = await this.Application.MainWindow.SaveFileDialog("Сохранить результат склонения в Microsoft Excel документ", "xlsx", "Файлы Microsoft Excel");
+
+            if (string.IsNullOrEmpty(fileName))
+            {
+                return;
+            }
+
+            FileInfo fi = new FileInfo(fileName);
+
+            if (fi.Exists)
+            {
+                fi.Delete();
+            }
+
+            ExcelPackage package = new ExcelPackage();
+
+            this.FillExportExcelPackage(package);
+
+            await Task.Run(() =>
+            {
+                foreach (ExcelWorksheet sheet in package.Workbook.Worksheets)
+                {
+                    sheet.Cells.AutoFitColumns();
+                }
+
+                package.SaveAs(fi);
+                package.Dispose();
+            });
+        }
         #endregion
     }
 }

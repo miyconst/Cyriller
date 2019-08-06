@@ -5,6 +5,7 @@ using System.Linq;
 using System.IO;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Avalonia;
 using Avalonia.Controls;
 using ReactiveUI;
 using OfficeOpenXml;
@@ -19,7 +20,7 @@ namespace Cyriller.Desktop.ViewModels
         public CyrAdjectiveCollection CyrAdjectiveCollection { get; protected set; }
         public List<AdjectiveDeclineResultRowModel> DeclineResult { get; protected set; }
 
-        public AdjectiveViewModel(CyrCollectionContainer container)
+        public AdjectiveViewModel(CyrCollectionContainer container, Application application) : base(application)
         {
             this.CyrAdjectiveCollection = container?.CyrAdjectiveCollection ?? throw new ArgumentNullException(nameof(CyrCollectionContainer.CyrAdjectiveCollection));
             this.InitDropDowns();
@@ -148,14 +149,78 @@ namespace Cyriller.Desktop.ViewModels
             this.SearchResultTitle = $"Результат поиска по запросу \"{this.InputText}\"";
         }
 
-        public override Task ExportToExcel(string fileName)
+        protected override string GetExportJsonString()
         {
-            throw new NotImplementedException();
+            object export = new
+            {
+                Word = this.InputText,
+                this.WordProperties,
+                this.DeclineResult
+            };
+
+            string json = JsonConvert.SerializeObject(export, Formatting.Indented);
+
+            return json;
         }
 
-        public override Task ExportToJson(string fileName)
+        protected override void FillExportExcelPackage(ExcelPackage package)
         {
-            throw new NotImplementedException();
+            ExcelWorksheet sheet = package.Workbook.Worksheets.Add(this.inputText);
+            int rowIndex = 1;
+
+            foreach (KeyValuePair<string, string> property in this.WordProperties)
+            {
+                sheet.Cells[rowIndex, 1].Value = property.Key;
+                sheet.Cells[rowIndex, 2].Value = property.Value;
+                rowIndex++;
+            }
+
+            rowIndex++;
+
+            {
+                ExcelRange range = sheet.Cells[rowIndex, 1, rowIndex, 2];
+                range.Merge = true;
+                range.Value = "Падеж";
+
+                sheet.Cells[rowIndex, 3].Value = "Мужской род, одушевленный предмет";
+                sheet.Cells[rowIndex, 4].Value = "Неодушевленный предмет";
+
+                sheet.Cells[rowIndex, 5].Value = "Женский род, одушевленный предмет";
+                sheet.Cells[rowIndex, 6].Value = "Неодушевленный предмет";
+
+                sheet.Cells[rowIndex, 7].Value = "Средний род, одушевленный предмет";
+                sheet.Cells[rowIndex, 8].Value = "Неодушевленный предмет";
+
+                sheet.Cells[rowIndex, 9].Value = "Множественное число, одушевленный предмет";
+                sheet.Cells[rowIndex, 10].Value = "Неодушевленный предмет";
+                rowIndex++;
+            }
+
+            foreach (AdjectiveDeclineResultRowModel row in this.DeclineResult)
+            {
+                string[] values = new string[]
+                {
+                    row.CaseName,
+                    row.CaseDescription,
+                    row.SingularMasculineAnimate,
+                    row.SingularMasculineInanimate,
+                    row.SingularFeminineAnimate,
+                    row.SingularFeminineInanimate,
+                    row.SingularNeuterAnimate,
+                    row.SingularNeuterInanimate,
+                    row.PluralAnimate,
+                    row.PluralInanimate
+                };
+
+                int colIndex = 1;
+
+                foreach (string value in values)
+                {
+                    sheet.Cells[rowIndex, colIndex++].Value = value;
+                }
+
+                rowIndex++;
+            }
         }
     }
 }

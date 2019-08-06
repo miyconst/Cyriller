@@ -11,16 +11,14 @@ namespace Cyriller.Desktop.Views
     {
         public static Window GetParentWindow(this IControl control)
         {
-            IControl parent = control?.Parent;
-
-            while (parent != null)
+            while (control != null)
             {
-                if (parent is Window window)
+                if (control is Window window)
                 {
                     return window;
                 }
 
-                parent = parent.Parent;
+                control = control.Parent;
             }
 
             throw new InvalidOperationException("Current Control is not attached to any Window object.");

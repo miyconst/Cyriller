@@ -5,11 +5,13 @@ using System.Linq;
 using System.IO;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Avalonia;
 using Avalonia.Controls;
 using ReactiveUI;
 using OfficeOpenXml;
 using Cyriller.Model;
 using Cyriller.Desktop.Models;
+using Cyriller.Desktop.Views;
 
 namespace Cyriller.Desktop.ViewModels
 {
@@ -17,7 +19,7 @@ namespace Cyriller.Desktop.ViewModels
     {
         public CyrNounCollection CyrNounCollection { get; protected set; }
 
-        public NounViewModel(CyrCollectionContainer container)
+        public NounViewModel(CyrCollectionContainer container, Application application) : base(application)
         {
             this.CyrNounCollection = container?.CyrNounCollection ?? throw new ArgumentNullException(nameof(CyrCollectionContainer.CyrNounCollection));
             this.InitDropDowns();
@@ -36,7 +38,7 @@ namespace Cyriller.Desktop.ViewModels
                 base.InputText = value;
             }
         }
-        
+
         public List<NounDeclineResultRowModel> DeclineResult { get; protected set; }
 
         public void ButtonSearch_Click()
@@ -115,20 +117,13 @@ namespace Cyriller.Desktop.ViewModels
             {
                 this.WordProperties.Add(new KeyValuePair<string, string>("Тип слова", new WordTypeModel(noun.WordType).Name));
             }
-            
+
             this.IsDeclineResultVisible = true;
             this.SearchResultTitle = $"Результат поиска по запросу \"{this.InputText}\"";
         }
 
-        public override async Task ExportToJson(string fileName)
+        protected override string GetExportJsonString()
         {
-            FileInfo fi = new FileInfo(fileName);
-
-            if (fi.Exists)
-            {
-                fi.Delete();
-            }
-
             object export = new
             {
                 Word = this.InputText,
@@ -137,34 +132,14 @@ namespace Cyriller.Desktop.ViewModels
             };
 
             string json = JsonConvert.SerializeObject(export, Formatting.Indented);
-            StreamWriter writer = new StreamWriter(fileName, false, Encoding.UTF8);
 
-            await writer.WriteAsync(json);
-            writer.Dispose();
+            return json;
         }
 
-        public override async Task ExportToExcel(string fileName)
+        protected override void FillExportExcelPackage(ExcelPackage package)
         {
-            FileInfo fi = new FileInfo(fileName);
-
-            if (fi.Exists)
-            {
-                fi.Delete();
-            }
-
-            ExcelPackage package = new ExcelPackage();
             ExcelWorksheet sheet = package.Workbook.Worksheets.Add(this.inputText);
             int rowIndex = 1;
-
-            sheet.Cells[rowIndex++, 1].Value = this.inputText;
-            rowIndex++;
-
-            {
-                ExcelRange range = sheet.Cells[rowIndex, 1, rowIndex, 2];
-                range.Merge = true;
-                range.Value = "Свойства существительного";
-                rowIndex++;
-            }
 
             foreach (KeyValuePair<string, string> property in this.WordProperties)
             {
@@ -193,13 +168,6 @@ namespace Cyriller.Desktop.ViewModels
                 sheet.Cells[rowIndex, 4].Value = row.Plural;
                 rowIndex++;
             }
-
-            await Task.Run(() =>
-            {
-                sheet.Cells.AutoFitColumns();
-                package.SaveAs(fi);
-                package.Dispose();
-            });
         }
     }
 }

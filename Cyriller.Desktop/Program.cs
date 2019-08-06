@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Logging.Serilog;
+using Avalonia.Input.Platform;
 using Cyriller.Desktop.ViewModels;
 using Cyriller.Desktop.Views;
 using Cyriller.Desktop.Models;
@@ -32,6 +33,7 @@ namespace Cyriller.Desktop
         {
             ServiceProvider = new ServiceCollection()
                 .AddSingleton<Application>(app)
+                .AddSingleton<IClipboard>(app.Clipboard)
                 .AddSingleton<CyrCollectionContainer>()
 
                 .AddSingleton<MainWindowViewModel>()
