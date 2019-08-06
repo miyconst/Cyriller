@@ -66,7 +66,7 @@ namespace Cyriller.Web.Controllers
             ViewBag.Text = w;
             ViewBag.Errors = errors;
             ViewBag.Results = results;
-            ViewBag.Cases = CyrDeclineCase.List;
+            ViewBag.Cases = CyrDeclineCase.GetEnumerable().ToArray();
 
             return View();
         }
@@ -123,7 +123,7 @@ namespace Cyriller.Web.Controllers
             ViewBag.Text = w;
             ViewBag.Errors = errors;
             ViewBag.Results = results;
-            ViewBag.Cases = CyrDeclineCase.List;
+            ViewBag.Cases = CyrDeclineCase.GetEnumerable().ToArray();
 
             return View();
         }
@@ -158,7 +158,7 @@ namespace Cyriller.Web.Controllers
             ViewBag.Errors = errors;
             ViewBag.Singular = singular;
             ViewBag.Plural = plural;
-            ViewBag.Cases = CyrDeclineCase.List;
+            ViewBag.Cases = CyrDeclineCase.GetEnumerable().ToArray();
 
             return View();
         }
@@ -254,7 +254,7 @@ namespace Cyriller.Web.Controllers
             ViewBag.Action = a;
             ViewBag.Result = result;
             ViewBag.Errors = errors;
-            ViewBag.Cases = CyrDeclineCase.List;
+            ViewBag.Cases = CyrDeclineCase.GetEnumerable().ToArray();
 
             return View();
         }
@@ -320,7 +320,7 @@ namespace Cyriller.Web.Controllers
             ViewBag.Errors = errors;
             ViewBag.Singulars = singulars;
             ViewBag.Plurals = plurals;
-            ViewBag.Cases = CyrDeclineCase.List;
+            ViewBag.Cases = CyrDeclineCase.GetEnumerable().ToArray();
 
             return View();
         }
@@ -397,7 +397,7 @@ namespace Cyriller.Web.Controllers
 
             string name = Guid.NewGuid() + ".xlsx";
             string path = Path.Combine(TempFolder, name);
-            CyrDeclineCase[] cases = CyrDeclineCase.List;
+            CyrDeclineCase[] cases = CyrDeclineCase.GetEnumerable().ToArray();
             CyrPhrase phrase = new CyrPhrase(NounCollection, AdjectiveCollection);
 
             ExcelWorksheet input = package.Workbook.Worksheets[1];
@@ -456,7 +456,7 @@ namespace Cyriller.Web.Controllers
         {
             string name = Guid.NewGuid() + ".txt";
             string path = Path.Combine(TempFolder, name);
-            CyrDeclineCase[] cases = CyrDeclineCase.List;
+            CyrDeclineCase[] cases = CyrDeclineCase.GetEnumerable().ToArray();
             CyrPhrase phrase = new CyrPhrase(NounCollection, AdjectiveCollection);
 
             TextReader reader = new StreamReader(File.InputStream, true);

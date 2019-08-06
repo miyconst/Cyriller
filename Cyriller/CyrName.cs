@@ -2204,7 +2204,7 @@ namespace Cyriller
         {
             string[] cases = new string[6];
 
-            foreach (CyrDeclineCase @case in CyrDeclineCase.List)
+            foreach (CyrDeclineCase @case in CyrDeclineCase.GetEnumerable())
             {
                 int caseIndex = @case.Index;
                 string[] values = decline(caseIndex);

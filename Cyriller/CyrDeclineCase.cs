@@ -28,12 +28,9 @@ namespace Cyriller
             this.Value = value;
         }
 
-        public static CyrDeclineCase[] List
+        public static IEnumerable<CyrDeclineCase> GetEnumerable()
         {
-            get
-            {
-                return new CyrDeclineCase[] { Case1, Case2, Case3, Case4, Case5, Case6 };
-            }
+            return new CyrDeclineCase[] { Case1, Case2, Case3, Case4, Case5, Case6 };
         }
 
         /// <summary>
