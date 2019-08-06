@@ -13,9 +13,11 @@
     <AvaloniaResource Include="Assets\*" />
   </ItemGroup>
   <ItemGroup>
+    <AvaloniaResource Remove="Views\AdjectiveView.xaml" />
     <AvaloniaResource Remove="Views\NounView.xaml" />
   </ItemGroup>
   <ItemGroup>
+    <None Remove="Views\AdjectiveView.xaml" />
     <None Remove="Views\NounView.xaml" />
   </ItemGroup>
   <ItemGroup>
@@ -28,6 +30,11 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Views\NounView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Views\AdjectiveView.xaml">
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
   </ItemGroup>

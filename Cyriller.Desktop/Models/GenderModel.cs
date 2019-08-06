@@ -30,5 +30,15 @@ namespace Cyriller.Desktop.Models
                     break;
             }
         }
+
+        public static IEnumerable<GenderModel> GetEnumerable()
+        {
+            Array values = Enum.GetValues(typeof(GendersEnum));
+
+            foreach (GendersEnum value in values)
+            {
+                yield return new GenderModel(value);
+            }
+        }
     }
 }

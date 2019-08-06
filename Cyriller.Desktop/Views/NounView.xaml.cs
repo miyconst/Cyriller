@@ -16,23 +16,6 @@ namespace Cyriller.Desktop.Views
             this.InitializeComponent();
         }
 
-        public Window GetParentWindow()
-        {
-            IControl parent = this.Parent;
-
-            while (parent != null)
-            {
-                if (parent is Window window)
-                {
-                    return window;
-                }
-
-                parent = parent.Parent;
-            }
-
-            throw new InvalidOperationException("Current UserControl is not attached to any Window object.");
-        }
-
         public NounViewModel ViewModel => this.DataContext as NounViewModel;
 
         private void InitializeComponent()
@@ -70,20 +53,6 @@ namespace Cyriller.Desktop.Views
             {
                 this.ViewModel?.ExportToExcel(file);
             }
-        }
-
-        protected virtual async Task<string> SaveFileDialog(string title, string fileExtension, string fileTypeDescription)
-        {
-            SaveFileDialog sfd = new SaveFileDialog();
-
-            sfd.Title = title;
-            sfd.Filters.Clear();
-            sfd.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { fileExtension }, Name = fileTypeDescription });
-
-            Window window = this.GetParentWindow();
-            string file = await sfd.ShowAsync(window);
-
-            return file;
         }
     }
 }

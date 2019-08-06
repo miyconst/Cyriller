@@ -25,9 +25,9 @@ namespace Cyriller.Desktop
         // container, etc.
         private static void AppMain(Application app, string[] args)
         {
-            var window = new MainWindow
+            var window = new MainWindow()
             {
-                DataContext = new MainWindowViewModel(),
+                DataContext = new MainWindowViewModel()
             };
 
             app.Run(window);

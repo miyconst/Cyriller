@@ -27,5 +27,15 @@ namespace Cyriller.Desktop.Models
                     break;
             }
         }
+
+        public static IEnumerable<AnimateModel> GetEnumerable()
+        {
+            Array values = Enum.GetValues(typeof(AnimatesEnum));
+
+            foreach (AnimatesEnum value in values)
+            {
+                yield return new AnimateModel(value);
+            }
+        }
     }
 }

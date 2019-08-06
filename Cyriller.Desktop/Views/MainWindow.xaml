@@ -8,10 +8,7 @@
         x:Class="Cyriller.Desktop.Views.MainWindow"
         Icon="/Assets/favicon.ico"
         Title="{Binding Title}">
-  <Design.DataContext>
-    <vm:MainWindowViewModel/>
-  </Design.DataContext>
-  <Grid RowDefinitions="Auto,Auto">
+  <Grid RowDefinitions="Auto,Auto,Auto">
     <Menu Grid.Row="0">
       <MenuItem Header="Кириллер">
         <MenuItem Header="О Программе (F1)" HotKey="F1">
@@ -32,7 +29,7 @@
             <Image Source="/Assets/noun-icon.png"></Image>
           </MenuItem.Icon>
         </MenuItem>
-        <MenuItem Header="Прилагательное (Ctrl + Shift + A)" HotKey="Ctrl+Shift+A">
+        <MenuItem Header="Прилагательное (Ctrl + Shift + A)" Command="{Binding MenuItem_Decline_Adjective_Click}" HotKey="Ctrl+Shift+A">
           <MenuItem.Icon>
             <Image Source="/Assets/adj-icon.png"></Image>
           </MenuItem.Icon>
@@ -44,6 +41,9 @@
     </Menu>
     <StackPanel Grid.Row="1" IsVisible="{Binding IsNounViewVisible}">
       <views:NounView DataContext="{Binding NounViewModel}" />
+    </StackPanel>
+    <StackPanel Grid.Row="2" IsVisible="{Binding IsAdjectiveVisible}">
+      <views:AdjectiveView DataContext="{Binding AdjectiveViewModel}" />
     </StackPanel>
   </Grid>
 </Window>

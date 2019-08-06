@@ -13,115 +13,64 @@ using Cyriller.Desktop.Models;
 
 namespace Cyriller.Desktop.ViewModels
 {
-    public class NounViewModel : ViewModelBase
+    public class NounViewModel : DeclineViewModel
     {
-        private static CyrNounCollection CyrNounCollection { get; set; }
-        private static Task LoadCyrNounCollectionTask = null;
+        public CyrNounCollection CyrNounCollection { get; protected set; }
 
-        protected bool isManualCaseGenderNumberInput = false;
-        protected bool isDeclineResultVisible = false;
-        protected string searchResultTitle = null;
-        protected string inputText = "кот";
-
-        public NounViewModel()
+        public NounViewModel(CyrCollectionContainer container)
         {
-            InitCyrNounCollection().GetAwaiter();
-
-            this.Genders = new List<KeyValuePair<GendersEnum, string>>()
-            {
-                new KeyValuePair<GendersEnum, string>(GendersEnum.Masculine, "Мужской род"),
-                new KeyValuePair<GendersEnum, string>(GendersEnum.Feminine, "Женский род"),
-                new KeyValuePair<GendersEnum, string>(GendersEnum.Neuter, "Нейтральный род"),
-                new KeyValuePair<GendersEnum, string>(GendersEnum.Undefined, "Неопределенный род")
-            };
-
-            this.Cases = CyrDeclineCase.List.ToList();
-
-            this.Numbers = new List<KeyValuePair<NumbersEnum, string>>()
-            {
-                new KeyValuePair<NumbersEnum, string>(NumbersEnum.Singular, "Единственное число"),
-                new KeyValuePair<NumbersEnum, string>(NumbersEnum.Plural, "Множественное число")
-            };
-
-            this.InputGender = this.Genders.First();
-            this.InputCase = this.Cases.First();
-            this.InputNumber = this.Numbers.First();
+            this.CyrNounCollection = container?.CyrNounCollection ?? throw new ArgumentNullException(nameof(CyrCollectionContainer.CyrNounCollection));
+            this.InitDropDowns();
         }
 
-        public string InputText
+        public override string InputText
         {
-            get => this.inputText;
+            get => base.InputText;
             set
             {
-                this.NounProperties.Clear();
-                this.DeclineResult.Clear();
-
-                this.RaiseAndSetIfChanged(ref this.inputText, value);
-                this.RaisePropertyChanged(nameof(NounProperties));
+                this.WordProperties?.Clear();
+                this.DeclineResult?.Clear();
+                this.RaisePropertyChanged(nameof(WordProperties));
                 this.RaisePropertyChanged(nameof(DeclineResult));
-                this.IsDeclineResultVisible = false;
+
+                base.InputText = value;
             }
         }
-
-        public KeyValuePair<GendersEnum, string> InputGender { get; set; }
-        public CyrDeclineCase InputCase { get; set; }
-        public KeyValuePair<NumbersEnum, string> InputNumber { get; set; }
-        public bool IsStrictSearch { get; set; }
-        public bool IsDeclineResultVisible
-        {
-            get => this.isDeclineResultVisible;
-            set => this.RaiseAndSetIfChanged(ref this.isDeclineResultVisible, value);
-        }
-        public bool IsManualCaseGenderNumberInput
-        {
-            get => this.isManualCaseGenderNumberInput;
-            set => this.RaiseAndSetIfChanged(ref this.isManualCaseGenderNumberInput, value);
-        }
-        public string SearchResultTitle
-        {
-            get => this.searchResultTitle;
-            set => this.RaiseAndSetIfChanged(ref this.searchResultTitle, value);
-        }
+        
         public List<NounDeclineResultRowModel> DeclineResult { get; protected set; }
-        public List<KeyValuePair<string, string>> NounProperties { get; protected set; }
-        public List<KeyValuePair<GendersEnum, string>> Genders { get; protected set; }
-        public List<CyrDeclineCase> Cases { get; protected set; }
-        public List<KeyValuePair<NumbersEnum, string>> Numbers { get; protected set; }
 
-        public async Task ButtonSearch_Click()
+        public void ButtonSearch_Click()
         {
             if (string.IsNullOrEmpty(this.InputText))
             {
                 return;
             }
 
-            await InitCyrNounCollection();
-
             CyrNoun noun = null;
             string foundWord = null;
 
-            if (this.IsStrictSearch && !this.IsManualCaseGenderNumberInput)
+            if (this.IsStrictSearch && !this.IsManualPropertiesInput)
             {
                 noun = CyrNounCollection.GetOrDefault(this.InputText, out CasesEnum _, out NumbersEnum _);
             }
-            else if (!this.IsStrictSearch && !this.IsManualCaseGenderNumberInput)
+            else if (!this.IsStrictSearch && !this.IsManualPropertiesInput)
             {
                 noun = CyrNounCollection.GetOrDefault(this.InputText, out foundWord, out CasesEnum _, out NumbersEnum _);
             }
-            else if (this.IsStrictSearch && this.IsManualCaseGenderNumberInput)
+            else if (this.IsStrictSearch && this.IsManualPropertiesInput)
             {
-                noun = CyrNounCollection.GetOrDefault(this.InputText, this.InputGender.Key, this.InputCase.Value, this.InputNumber.Key);
+                noun = CyrNounCollection.GetOrDefault(this.InputText, this.InputGender.Value, this.InputCase.Value, this.InputNumber.Value);
             }
-            else if (!this.IsStrictSearch && this.IsManualCaseGenderNumberInput)
+            else if (!this.IsStrictSearch && this.IsManualPropertiesInput)
             {
-                noun = CyrNounCollection.GetOrDefault(this.InputText, out foundWord, this.InputGender.Key, this.InputCase.Value, this.InputNumber.Key);
+                noun = CyrNounCollection.GetOrDefault(this.InputText, out foundWord, this.InputGender.Value, this.InputCase.Value, this.InputNumber.Value);
             }
 
             this.DeclineResult = new List<NounDeclineResultRowModel>();
-            this.NounProperties = new List<KeyValuePair<string, string>>();
+            this.WordProperties = new List<KeyValuePair<string, string>>();
 
             this.RaisePropertyChanged(nameof(DeclineResult));
-            this.RaisePropertyChanged(nameof(NounProperties));
+            this.RaisePropertyChanged(nameof(WordProperties));
 
             if (noun == null)
             {
@@ -133,7 +82,7 @@ namespace Cyriller.Desktop.ViewModels
             CyrResult singular = noun.Decline();
             CyrResult plural = noun.DeclinePlural();
 
-            foreach (CyrDeclineCase @case in CyrDeclineCase.List)
+            foreach (CyrDeclineCase @case in CyrDeclineCase.GetEnumerable())
             {
                 this.DeclineResult.Add(new NounDeclineResultRowModel()
                 {
@@ -146,41 +95,22 @@ namespace Cyriller.Desktop.ViewModels
 
             if (!string.IsNullOrWhiteSpace(foundWord) && !string.Equals(foundWord, noun.Name, StringComparison.InvariantCulture))
             {
-                this.NounProperties.Add(new KeyValuePair<string, string>("Слово в словаре", foundWord));
+                this.WordProperties.Add(new KeyValuePair<string, string>("Слово в словаре", foundWord));
             }
 
-            this.NounProperties.Add(new KeyValuePair<string, string>("Род", new GenderModel(noun.Gender).Name));
+            this.WordProperties.Add(new KeyValuePair<string, string>("Род", new GenderModel(noun.Gender).Name));
 
             if (noun.WordType != WordTypesEnum.None)
             {
-                this.NounProperties.Add(new KeyValuePair<string, string>("Тип слова", new WordTypeModel(noun.WordType).Name));
+                this.WordProperties.Add(new KeyValuePair<string, string>("Тип слова", new WordTypeModel(noun.WordType).Name));
             }
 
-            this.NounProperties.Add(new KeyValuePair<string, string>("Одушевленность", new AnimateModel(noun.Animate).Name));
+            this.WordProperties.Add(new KeyValuePair<string, string>("Одушевленность", new AnimateModel(noun.Animate).Name));
             this.IsDeclineResultVisible = true;
             this.SearchResultTitle = $"Результат поиска по запросу \"{this.InputText}\"";
         }
 
-        public async Task InitCyrNounCollection()
-        {
-            if (CyrNounCollection != null)
-            {
-                return;
-            }
-
-            if (LoadCyrNounCollectionTask == null)
-            {
-                LoadCyrNounCollectionTask = Task.Run(() =>
-                {
-                    CyrNounCollection = new CyrNounCollection();
-                    LoadCyrNounCollectionTask = null;
-                });
-            }
-
-            await LoadCyrNounCollectionTask;
-        }
-
-        public async Task ExportToJson(string fileName)
+        public override async Task ExportToJson(string fileName)
         {
             FileInfo fi = new FileInfo(fileName);
 
@@ -192,7 +122,7 @@ namespace Cyriller.Desktop.ViewModels
             object export = new
             {
                 Word = this.InputText,
-                this.NounProperties,
+                this.WordProperties,
                 this.DeclineResult
             };
 
@@ -203,7 +133,7 @@ namespace Cyriller.Desktop.ViewModels
             writer.Dispose();
         }
 
-        public async Task ExportToExcel(string fileName)
+        public override async Task ExportToExcel(string fileName)
         {
             FileInfo fi = new FileInfo(fileName);
 
@@ -226,7 +156,7 @@ namespace Cyriller.Desktop.ViewModels
                 rowIndex++;
             }
 
-            foreach (KeyValuePair<string, string> property in this.NounProperties)
+            foreach (KeyValuePair<string, string> property in this.WordProperties)
             {
                 sheet.Cells[rowIndex, 1].Value = property.Key;
                 sheet.Cells[rowIndex, 2].Value = property.Value;
