@@ -12,7 +12,7 @@ namespace Cyriller.Desktop.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase
     {
-        protected string title = "Cyriller Desktop";
+        protected string title = null;
         protected bool isNounViewVisible = false;
         protected bool isAdjectiveVisible = false;
         protected bool isNameVisible = false;
@@ -88,13 +88,15 @@ namespace Cyriller.Desktop.ViewModels
             this.Application = application ?? throw new ArgumentNullException(nameof(application));
             this.CyrCollectionContainer = container ?? throw new ArgumentNullException(nameof(container));
             this.CyrCollectionContainer.InitCollectionsInBackground();
+            this.MenuItem_About_Click();
         }
 
         public virtual void MenuItem_About_Click()
         {
             this.HideAll();
             this.IsAboutVisible = true;
-        }
+            this.Title = "Настольный Кириллер";
+    }
 
         public virtual void MenuItem_Exit_Click()
         {
@@ -145,7 +147,7 @@ namespace Cyriller.Desktop.ViewModels
         public virtual void MenuItem_Decline_Name_Click()
         {
             this.Busy();
-            this.title = "Склонение личных имен без использования словаря";
+            this.Title = "Склонение личных имен без использования словаря";
             this.HideAll();
             this.IsNameVisible = true;
 
@@ -163,7 +165,7 @@ namespace Cyriller.Desktop.ViewModels
         public async virtual void MenuItem_Decline_Number_Click()
         {
             this.Busy();
-            this.title = "Склонение чисел, сумм и количеств";
+            this.Title = "Склонение чисел, сумм и количеств";
             this.HideAll();
             this.IsNumberVisible = true;
 
@@ -183,7 +185,7 @@ namespace Cyriller.Desktop.ViewModels
         public async virtual void MenuItem_Decline_Phrase_Click()
         {
             this.Busy();
-            this.title = "Склонять словосочетание";
+            this.Title = "Склонение словосочетаний по падежам";
             this.HideAll();
             this.IsPhraseVisible = true;
 
