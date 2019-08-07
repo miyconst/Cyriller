@@ -255,7 +255,7 @@ namespace Cyriller
                     patronymic = this.ProperCase(str3);
                 }
             }
-            else
+            else if (!string.IsNullOrEmpty(str2))
             {
                 if (str2.EndsWith("ич") || str2.EndsWith("вна") || str2.EndsWith("чна"))
                 {
@@ -267,6 +267,10 @@ namespace Cyriller
                     surname = this.ProperCase(str1);
                     name = this.ProperCase(str2);
                 }
+            }
+            else
+            {
+                surname = str1;
             }
 
             return Decline(surname, name, patronymic, @case, gender, shorten);
