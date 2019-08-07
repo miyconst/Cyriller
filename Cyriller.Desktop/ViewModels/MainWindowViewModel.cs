@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Avalonia;
 using Avalonia.Input;
@@ -74,6 +75,7 @@ namespace Cyriller.Desktop.ViewModels
             set => this.RaiseAndSetIfChanged(ref this.isAboutVisible, value);
         }
 
+        public Application Application { get; protected set; }
         public CyrCollectionContainer CyrCollectionContainer { get; protected set; }
         public NounViewModel NounViewModel { get; protected set; }
         public AdjectiveViewModel AdjectiveViewModel { get; protected set; }
@@ -81,8 +83,9 @@ namespace Cyriller.Desktop.ViewModels
         public NumberViewModel NumberViewModel { get; protected set; }
         public PhraseViewModel PhraseViewModel { get; protected set; }
 
-        public MainWindowViewModel(CyrCollectionContainer container)
+        public MainWindowViewModel(Application application, CyrCollectionContainer container)
         {
+            this.Application = application ?? throw new ArgumentNullException(nameof(application));
             this.CyrCollectionContainer = container ?? throw new ArgumentNullException(nameof(container));
             this.CyrCollectionContainer.InitCollectionsInBackground();
         }
@@ -195,6 +198,11 @@ namespace Cyriller.Desktop.ViewModels
             this.PhraseViewModel = Program.ServiceProvider.GetService<PhraseViewModel>();
             this.RaisePropertyChanged(nameof(PhraseViewModel));
             this.OnFormOpened(this.PhraseFormOpened);
+        }
+
+        public void CopyToClipboard(string value)
+        {
+            this.Application.Clipboard.SetTextAsync(value);
         }
 
         protected virtual void HideAll()
