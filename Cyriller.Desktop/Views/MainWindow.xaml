@@ -36,7 +36,7 @@
           </MenuItem.Icon>
         </MenuItem>
         <MenuItem Header="Словосочетание"></MenuItem>
-        <MenuItem Header="Число"></MenuItem>
+        <MenuItem Header="Число (Ctrl + Shift + X)" Command="{Binding MenuItem_Decline_Number_Click}" HotKey="Ctrl+Shift+X"></MenuItem>
         <MenuItem Header="Имя (Ctrl + Shift + B)" Command="{Binding MenuItem_Decline_Name_Click}" HotKey="Ctrl+Shift+B"></MenuItem>
       </MenuItem>
     </Menu>
@@ -71,6 +71,9 @@
     </StackPanel>
     <StackPanel Grid.Row="4" IsVisible="{Binding IsNameVisible}">
       <views:NameView DataContext="{Binding NameViewModel}" Name="ucName" />
+    </StackPanel>
+    <StackPanel Grid.Row="5" IsVisible="{Binding IsNumberVisible}">
+      <views:NumberView DataContext="{Binding NumberViewModel}" Name="ucNumber"></views:NumberView>
     </StackPanel>
   </Grid>
 </Window>

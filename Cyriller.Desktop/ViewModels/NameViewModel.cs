@@ -18,7 +18,7 @@ namespace Cyriller.Desktop.ViewModels
         protected string inputPatronymic;
 
         public CyrName CyrName { get; protected set; }
-        public List<NameDeclineResultRowModel> DeclineResult { get; protected set; }
+        public List<SingleValueDeclineResultRowModel> DeclineResult { get; protected set; }
 
         public bool IsShorten
         {
@@ -78,7 +78,7 @@ namespace Cyriller.Desktop.ViewModels
                 return;
             }
 
-            this.DeclineResult = new List<NameDeclineResultRowModel>();
+            this.DeclineResult = new List<SingleValueDeclineResultRowModel>();
             this.WordProperties = new List<KeyValuePair<string, string>>();
 
             this.RaisePropertyChanged(nameof(DeclineResult));
@@ -103,7 +103,7 @@ namespace Cyriller.Desktop.ViewModels
 
             foreach (CyrDeclineCase @case in CyrDeclineCase.GetEnumerable())
             {
-                this.DeclineResult.Add(new NameDeclineResultRowModel()
+                this.DeclineResult.Add(new SingleValueDeclineResultRowModel()
                 {
                     CaseName = @case.NameRu,
                     CaseDescription = @case.Description,
@@ -172,7 +172,7 @@ namespace Cyriller.Desktop.ViewModels
                 rowIndex++;
             }
 
-            foreach (NameDeclineResultRowModel row in this.DeclineResult)
+            foreach (SingleValueDeclineResultRowModel row in this.DeclineResult)
             {
                 sheet.Cells[rowIndex, 1].Value = row.CaseName;
                 sheet.Cells[rowIndex, 2].Value = row.CaseDescription;

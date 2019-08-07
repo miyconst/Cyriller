@@ -15,12 +15,14 @@ namespace Cyriller.Desktop.ViewModels
         protected bool isNounViewVisible = false;
         protected bool isAdjectiveVisible = false;
         protected bool isNameVisible = false;
+        protected bool isNumberVisible = false;
         protected bool isAboutVisible = true;
         protected Cursor cursor = Cursor.Default;
 
         public event EventHandler NounFormOpened;
         public event EventHandler AdjectiveFormOpened;
         public event EventHandler NameFormOpened;
+        public event EventHandler NumberFormOpened;
 
         public string Title
         {
@@ -52,6 +54,12 @@ namespace Cyriller.Desktop.ViewModels
             set => this.RaiseAndSetIfChanged(ref this.isNameVisible, value);
         }
 
+        public bool IsNumberVisible
+        {
+            get => this.isNumberVisible;
+            set => this.RaiseAndSetIfChanged(ref this.isNumberVisible, value);
+        }
+
         public bool IsAboutVisible
         {
             get => this.isAboutVisible;
@@ -62,6 +70,7 @@ namespace Cyriller.Desktop.ViewModels
         public NounViewModel NounViewModel { get; protected set; }
         public AdjectiveViewModel AdjectiveViewModel { get; protected set; }
         public NameViewModel NameViewModel { get; protected set; }
+        public NumberViewModel NumberViewModel { get; protected set; }
 
         public MainWindowViewModel(CyrCollectionContainer container)
         {
@@ -139,11 +148,32 @@ namespace Cyriller.Desktop.ViewModels
             this.OnFormOpened(this.NameFormOpened);
         }
 
+        public async virtual void MenuItem_Decline_Number_Click()
+        {
+            this.Busy();
+            this.title = "Склонение чисел, сумм и количеств";
+            this.HideAll();
+            this.IsNumberVisible = true;
+
+            if (this.NumberViewModel != null)
+            {
+                this.OnFormOpened(this.NumberFormOpened);
+                return;
+            }
+
+            await this.CyrCollectionContainer.InitOrDefault();
+
+            this.NumberViewModel = Program.ServiceProvider.GetService<NumberViewModel>();
+            this.RaisePropertyChanged(nameof(NumberViewModel));
+            this.OnFormOpened(this.NumberFormOpened);
+        }
+
         protected virtual void HideAll()
         {
             this.IsAboutVisible = false;
             this.IsNounViewVisible = false;
             this.IsAdjectiveVisible = false;
+            this.IsNumberVisible = false;
             this.IsNameVisible = false;
         }
 

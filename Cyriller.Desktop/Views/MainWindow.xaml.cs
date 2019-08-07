@@ -11,7 +11,7 @@ namespace Cyriller.Desktop.Views
 {
     public class MainWindow : Window
     {
-        protected int FocusTimeout { get; set; } = 1;
+        protected int FocusTimeout { get; set; } = 10;
 
         public MainWindow(MainWindowViewModel dataContext)
         {
@@ -21,6 +21,14 @@ namespace Cyriller.Desktop.Views
             dataContext.NounFormOpened += DataContext_NounFormOpened;
             dataContext.AdjectiveFormOpened += DataContext_AdjectiveFormOpened;
             dataContext.NameFormOpened += DataContext_NameFormOpened;
+            dataContext.NumberFormOpened += DataContext_NumberFormOpened;
+        }
+
+        private async void DataContext_NumberFormOpened(object sender, EventArgs e)
+        {
+            // This delay is needed to focus element after UI is updated.
+            await Task.Delay(this.FocusTimeout);
+            this.Find<NumberView>("ucNumber").Focus();
         }
 
         private async void DataContext_NameFormOpened(object sender, EventArgs e)

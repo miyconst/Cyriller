@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Cyriller.Desktop.Models
 {
-    public class NameDeclineResultRowModel : DeclineResultRowModel
+    public class SingleValueDeclineResultRowModel : DeclineResultRowModel
     {
         public string Value { get; set; }
     }

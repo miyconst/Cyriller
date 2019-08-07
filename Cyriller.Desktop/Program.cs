@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Globalization;
+using System.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using Avalonia;
 using Avalonia.Controls;
@@ -17,7 +19,18 @@ namespace Cyriller.Desktop
         // Initialization code. Don't use any Avalonia, third-party APIs or any
         // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
         // yet and stuff might break.
-        public static void Main(string[] args) => BuildAvaloniaApp().Start(AppMain, args);
+        public static void Main(string[] args)
+        {
+            CultureInfo ci = CultureInfo.GetCultureInfo("ru-RU");
+
+            Thread.CurrentThread.CurrentCulture = ci;
+            Thread.CurrentThread.CurrentUICulture = ci;
+
+            CultureInfo.DefaultThreadCurrentCulture = ci;
+            CultureInfo.DefaultThreadCurrentUICulture = ci;
+
+            BuildAvaloniaApp().Start(AppMain, args);
+        }
 
         // Avalonia configuration, don't remove; also used by visual designer.
         public static AppBuilder BuildAvaloniaApp()
@@ -36,6 +49,7 @@ namespace Cyriller.Desktop
                 .AddSingleton<IClipboard>(app.Clipboard)
                 .AddSingleton<CyrCollectionContainer>()
                 .AddTransient<CyrName>()
+                .AddTransient<CyrNumber>()
 
                 .AddSingleton<MainWindowViewModel>()
                 .AddSingleton<MainWindow>()
@@ -43,6 +57,7 @@ namespace Cyriller.Desktop
                 .AddTransient<NounViewModel>()
                 .AddTransient<AdjectiveViewModel>()
                 .AddTransient<NameViewModel>()
+                .AddTransient<NumberViewModel>()
 
                 .BuildServiceProvider();
 
