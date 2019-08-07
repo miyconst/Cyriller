@@ -16,8 +16,6 @@ namespace Cyriller.Desktop.Views
             this.InitializeComponent();
         }
 
-        public NounViewModel ViewModel => this.DataContext as NounViewModel;
-
         public new void Focus()
         {
             base.Focus();
