@@ -108,6 +108,11 @@ namespace Cyriller.Desktop.ViewModels
 
             this.WordProperties.Add(new KeyValuePair<string, string>("Значение", valueStr));
 
+            if (!this.isInputAmount)
+            {
+                this.WordProperties.Add(new KeyValuePair<string, string>("Падеж", this.InputGender.Name));
+            }
+
             if (this.isInputAmount)
             {
                 result = this.CyrNumber.Decline(this.inputValue, this.inputCurrency);
@@ -145,7 +150,34 @@ namespace Cyriller.Desktop.ViewModels
 
         protected override void FillExportExcelPackage(ExcelPackage package)
         {
-            throw new NotImplementedException();
+            ExcelWorksheet sheet = package.Workbook.Worksheets.Add(this.InputNumber.ToString());
+            int rowIndex = 1;
+
+            foreach (KeyValuePair<string, string> property in this.WordProperties)
+            {
+                sheet.Cells[rowIndex, 1].Value = property.Key;
+                sheet.Cells[rowIndex, 2].Value = property.Value;
+                rowIndex++;
+            }
+
+            rowIndex++;
+
+            {
+                ExcelRange range = sheet.Cells[rowIndex, 1, rowIndex, 2];
+                range.Merge = true;
+                range.Value = "Падеж";
+
+                sheet.Cells[rowIndex, 3].Value = "Значение";
+                rowIndex++;
+            }
+
+            foreach (SingleValueDeclineResultRowModel row in this.DeclineResult)
+            {
+                sheet.Cells[rowIndex, 1].Value = row.CaseName;
+                sheet.Cells[rowIndex, 2].Value = row.CaseDescription;
+                sheet.Cells[rowIndex, 3].Value = row.Value;
+                rowIndex++;
+            }
         }
 
         protected override string GetExportJsonString()
