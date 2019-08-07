@@ -41,8 +41,10 @@ namespace Cyriller.Desktop.ViewModels
 
         public List<NounDeclineResultRowModel> DeclineResult { get; protected set; }
 
-        public void ButtonSearch_Click()
+        public void Decline()
         {
+            this.InputText = this.inputText?.Trim();
+
             if (string.IsNullOrEmpty(this.InputText))
             {
                 return;

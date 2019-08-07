@@ -37,8 +37,10 @@ namespace Cyriller.Desktop.ViewModels
             this.InputAnimate = this.Animates.First();
         }
 
-        public void ButtonSearch_Click()
+        public void Decline()
         {
+            this.InputText = this.inputText?.Trim();
+
             if (string.IsNullOrEmpty(this.InputText))
             {
                 return;

@@ -85,7 +85,11 @@ namespace Cyriller.Desktop.ViewModels
         public bool IsManualPropertiesInput
         {
             get => this.isManualPropertiesInput;
-            set => this.RaiseAndSetIfChanged(ref this.isManualPropertiesInput, value);
+            set
+            {
+                this.RaiseAndSetIfChanged(ref this.isManualPropertiesInput, value);
+                this.IsDeclineResultVisible = false;
+            }
         }
 
         public string SearchResultTitle

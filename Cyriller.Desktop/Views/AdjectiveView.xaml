@@ -7,8 +7,8 @@
   <StackPanel Margin="10">
     <TextBlock FontWeight="Bold" FontSize="16" Margin="5">Поиск прилагательного</TextBlock>
     <Grid RowDefinitions="Auto" ColumnDefinitions="*,200">
-      <TextBox Text="{Binding InputText}" Grid.Column="0" Margin="5" Name="txtInputText"></TextBox>
-      <Button Command="{Binding ButtonSearch_Click}" Grid.Column="1" Margin="5" IsDefault="True" HotKey="F5">Склонять (F5)</Button>
+      <TextBox Text="{Binding InputText}" Grid.Column="0" Margin="5" Name="txtInputText" Watermark="Введите прилагательное для поиска и склонения"></TextBox>
+      <Button Command="{Binding Decline}" Grid.Column="1" Margin="5" IsDefault="True" HotKey="F5">Склонять (F5)</Button>
     </Grid>
     <Grid RowDefinitions="Auto" ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,Auto">
       <CheckBox Grid.Column="0" Margin="5,10,5,10" ToolTip.Tip="Только слова из словаря" IsChecked="{Binding IsStrictSearch}">Точное совпадение</CheckBox>
