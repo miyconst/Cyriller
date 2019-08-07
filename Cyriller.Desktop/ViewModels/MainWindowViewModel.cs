@@ -15,6 +15,7 @@ namespace Cyriller.Desktop.ViewModels
         protected bool isNounViewVisible = false;
         protected bool isAdjectiveVisible = false;
         protected bool isNameVisible = false;
+        protected bool isAboutVisible = true;
         protected Cursor cursor = Cursor.Default;
 
         public event EventHandler NounFormOpened;
@@ -51,6 +52,12 @@ namespace Cyriller.Desktop.ViewModels
             set => this.RaiseAndSetIfChanged(ref this.isNameVisible, value);
         }
 
+        public bool IsAboutVisible
+        {
+            get => this.isAboutVisible;
+            set => this.RaiseAndSetIfChanged(ref this.isAboutVisible, value);
+        }
+
         public CyrCollectionContainer CyrCollectionContainer { get; protected set; }
         public NounViewModel NounViewModel { get; protected set; }
         public AdjectiveViewModel AdjectiveViewModel { get; protected set; }
@@ -60,6 +67,12 @@ namespace Cyriller.Desktop.ViewModels
         {
             this.CyrCollectionContainer = container ?? throw new ArgumentNullException(nameof(container));
             this.CyrCollectionContainer.InitCollectionsInBackground();
+        }
+
+        public virtual void MenuItem_About_Click()
+        {
+            this.HideAll();
+            this.IsAboutVisible = true;
         }
 
         public virtual void MenuItem_Exit_Click()
@@ -128,6 +141,7 @@ namespace Cyriller.Desktop.ViewModels
 
         protected virtual void HideAll()
         {
+            this.IsAboutVisible = false;
             this.IsNounViewVisible = false;
             this.IsAdjectiveVisible = false;
             this.IsNameVisible = false;

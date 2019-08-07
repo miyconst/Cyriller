@@ -4,14 +4,15 @@
         xmlns:views="clr-namespace:Cyriller.Desktop.Views;assembly=Cyriller.Desktop"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="450"
+        MinWidth="1000" MinHeight="700"
         x:Class="Cyriller.Desktop.Views.MainWindow"
         Icon="/Assets/favicon.ico"
         Title="{Binding Title}" Cursor="{Binding Cursor}">
-  <Grid RowDefinitions="Auto,Auto,Auto,Auto">
+  <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto">
     <Menu Grid.Row="0">
       <MenuItem Header="Кириллер">
-        <MenuItem Header="О Программе (F1)" HotKey="F1">
+        <MenuItem Header="О Программе (F1)" HotKey="F1" Command="{Binding MenuItem_About_Click}">
           <MenuItem.Icon>
             <Image Source="/Assets/info-icon.png"></Image>
           </MenuItem.Icon>
@@ -39,13 +40,36 @@
         <MenuItem Header="Имя (Ctrl + Shift + B)" Command="{Binding MenuItem_Decline_Name_Click}" HotKey="Ctrl+Shift+B"></MenuItem>
       </MenuItem>
     </Menu>
-    <StackPanel Grid.Row="1" IsVisible="{Binding IsNounViewVisible}">
+    <StackPanel Grid.Row="1" IsVisible="{Binding IsAboutVisible}" Margin="10">
+      <Image Source="/Assets/favicon.ico"></Image>
+      <TextBlock FontSize="24" Margin="5,5,5,0">Кириллер</TextBlock>
+      <TextBlock Margin="5,0,5,10">Бесплатная программа склонения по падежам</TextBlock>
+      <TextBlock Margin="5" FontSize="16">На данные момент программа умеет:</TextBlock>
+      <StackPanel Margin="10,0,0,10">
+        <TextBlock Margin="5,3,5,3">1. Склонять личные имена, фамилии, отчества без использования словара.</TextBlock>
+        <TextBlock Margin="5,3,5,3">2. Склонять существительные русского языка, включая имена с использованием словаря.</TextBlock>
+        <TextBlock Margin="5,3,5,3">3. Склонять существительные, которых нет в словаре по ближайшему совпадению.</TextBlock>
+        <TextBlock Margin="5,3,5,3">4. Распознавать существительные, указанные в любом падеже и числе.</TextBlock>
+        <TextBlock Margin="5,3,5,3">5. Склонять прилагательные русского языка с использованием словаря.</TextBlock>
+        <TextBlock Margin="5,3,5,3">6. Склонять прилагательные, которых нет в словаре по ближайшему совпадению.</TextBlock>
+        <TextBlock Margin="5,3,5,3">7. Распознавать прилагательные, указанные в любом роде, падеже и числе.</TextBlock>
+        <TextBlock Margin="5,3,5,3">8. Писать числа прописью во всех падежах.</TextBlock>
+        <TextBlock Margin="5,3,5,3">9. Писать деньги прописью, в рублях, долларах, евро, юанях.</TextBlock>
+        <TextBlock Margin="5,3,5,3">10. Писать числа прописью вместе с единицей измерения.</TextBlock>
+      </StackPanel>
+      <StackPanel Orientation="Horizontal">
+        <Button Margin="5" Background="Transparent" BorderThickness="0" Foreground="Blue" Cursor="Hand">Исходный код - github.com/miyconst/Cyriller</Button>
+        <Button Margin="5" Background="Transparent" BorderThickness="0" Foreground="Blue" Cursor="Hand">Веб-сайт проекта - cyriller.2try.ws</Button>
+        <Button Margin="5" Background="Transparent" BorderThickness="0" Foreground="Blue" Cursor="Hand">Лицензия использования - LGPL-3.0</Button>
+      </StackPanel>
+    </StackPanel>
+    <StackPanel Grid.Row="2" IsVisible="{Binding IsNounViewVisible}">
       <views:NounView DataContext="{Binding NounViewModel}" Name="ucNoun" />
     </StackPanel>
-    <StackPanel Grid.Row="2" IsVisible="{Binding IsAdjectiveVisible}">
+    <StackPanel Grid.Row="3" IsVisible="{Binding IsAdjectiveVisible}">
       <views:AdjectiveView DataContext="{Binding AdjectiveViewModel}" Name="ucAdjective" />
     </StackPanel>
-    <StackPanel Grid.Row="3" IsVisible="{Binding IsNameVisible}">
+    <StackPanel Grid.Row="4" IsVisible="{Binding IsNameVisible}">
       <views:NameView DataContext="{Binding NameViewModel}" Name="ucName" />
     </StackPanel>
   </Grid>
