@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Avalonia;
 using Avalonia.Controls;
@@ -21,13 +22,8 @@ namespace Cyriller.Desktop
         // yet and stuff might break.
         public static void Main(string[] args)
         {
-            CultureInfo ci = CultureInfo.GetCultureInfo("ru-RU");
-
-            Thread.CurrentThread.CurrentCulture = ci;
-            Thread.CurrentThread.CurrentUICulture = ci;
-
-            CultureInfo.DefaultThreadCurrentCulture = ci;
-            CultureInfo.DefaultThreadCurrentUICulture = ci;
+            SetupCultureInfo();
+            SetupExceptionHandling();
 
             BuildAvaloniaApp().Start(AppMain, args);
         }
@@ -65,6 +61,38 @@ namespace Cyriller.Desktop
             MainWindow window = ServiceProvider.GetService<MainWindow>();
 
             app.Run(window);
+        }
+
+        private static void SetupExceptionHandling()
+        {
+            AppDomain.CurrentDomain.UnhandledException += (s, e) =>
+            {
+                LogUnhandledException((Exception)e.ExceptionObject, "AppDomain.CurrentDomain.UnhandledException");
+            };
+
+            TaskScheduler.UnobservedTaskException += (s, e) =>
+            {
+                LogUnhandledException(e.Exception, $"TaskScheduler.UnobservedTaskException");
+            };
+        }
+
+        private static void LogUnhandledException(Exception exception, string source)
+        {
+            Logger logger = new Logger();
+            logger.LogException(exception, source);
+            App.Current.Exit();
+            Thread.CurrentThread.Abort();
+        }
+
+        private static void SetupCultureInfo()
+        {
+            CultureInfo ci = CultureInfo.GetCultureInfo("ru-RU");
+
+            Thread.CurrentThread.CurrentCulture = ci;
+            Thread.CurrentThread.CurrentUICulture = ci;
+
+            CultureInfo.DefaultThreadCurrentCulture = ci;
+            CultureInfo.DefaultThreadCurrentUICulture = ci;
         }
     }
 }

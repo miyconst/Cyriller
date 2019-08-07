@@ -9,5 +9,5 @@ namespace Cyriller.Desktop
         {
             AvaloniaXamlLoader.Load(this);
         }
-   }
+    }
 }
