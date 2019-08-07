@@ -10,7 +10,7 @@
       <Grid RowDefinitions="Auto" ColumnDefinitions="*,200">
         <TextBox Text="{Binding InputText}" Grid.Column="0" Margin="5" Name="txtInputText" IsVisible="{Binding !IsManualPropertiesInput}" Watermark="Введите полное имя для склонения"></TextBox>
         <Grid RowDefinitions="Auto" ColumnDefinitions="*,*,*" Grid.Column="0" IsVisible="{Binding IsManualPropertiesInput}">
-          <TextBox Text="{Binding InputSurname}" Grid.Column="0" Margin="5" Watermark="Фамилия"></TextBox>
+          <TextBox Text="{Binding InputSurname}" Grid.Column="0" Margin="5" Watermark="Фамилия" Name="txtSurname"></TextBox>
           <TextBox Text="{Binding InputName}" Grid.Column="1" Margin="5" Watermark="Имя"></TextBox>
           <TextBox Text="{Binding InputPatronymic}" Grid.Column="2" Margin="5" Watermark="Отчество"></TextBox>
         </Grid>
