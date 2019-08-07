@@ -8,7 +8,7 @@
         x:Class="Cyriller.Desktop.Views.MainWindow"
         Icon="/Assets/favicon.ico"
         Title="{Binding Title}" Cursor="{Binding Cursor}">
-  <Grid RowDefinitions="Auto,Auto,Auto">
+  <Grid RowDefinitions="Auto,Auto,Auto,Auto">
     <Menu Grid.Row="0">
       <MenuItem Header="Кириллер">
         <MenuItem Header="О Программе (F1)" HotKey="F1">
@@ -24,19 +24,19 @@
         </MenuItem>
       </MenuItem>
       <MenuItem Header="Склонять">
-        <MenuItem Header="Существительное (Ctrl + Shift + N)" Command="{Binding MenuItem_Decline_Noun_Click}" HotKey="Ctrl+Shift+N">
+        <MenuItem Header="Существительное (Ctrl + Shift + C)" Command="{Binding MenuItem_Decline_Noun_Click}" HotKey="Ctrl+Shift+C">
           <MenuItem.Icon>
             <Image Source="/Assets/noun-icon.png"></Image>
           </MenuItem.Icon>
         </MenuItem>
-        <MenuItem Header="Прилагательное (Ctrl + Shift + A)" Command="{Binding MenuItem_Decline_Adjective_Click}" HotKey="Ctrl+Shift+A">
+        <MenuItem Header="Прилагательное (Ctrl + Shift + G)" Command="{Binding MenuItem_Decline_Adjective_Click}" HotKey="Ctrl+Shift+G">
           <MenuItem.Icon>
             <Image Source="/Assets/adj-icon.png"></Image>
           </MenuItem.Icon>
         </MenuItem>
         <MenuItem Header="Словосочетание"></MenuItem>
         <MenuItem Header="Число"></MenuItem>
-        <MenuItem Header="Имя"></MenuItem>
+        <MenuItem Header="Имя (Ctrl + Shift + B)" Command="{Binding MenuItem_Decline_Name_Click}" HotKey="Ctrl+Shift+B"></MenuItem>
       </MenuItem>
     </Menu>
     <StackPanel Grid.Row="1" IsVisible="{Binding IsNounViewVisible}">
@@ -44,6 +44,9 @@
     </StackPanel>
     <StackPanel Grid.Row="2" IsVisible="{Binding IsAdjectiveVisible}">
       <views:AdjectiveView DataContext="{Binding AdjectiveViewModel}" Name="ucAdjective" />
+    </StackPanel>
+    <StackPanel Grid.Row="3" IsVisible="{Binding IsNameVisible}">
+      <views:NameView DataContext="{Binding NameViewModel}" Name="ucName" />
     </StackPanel>
   </Grid>
 </Window>

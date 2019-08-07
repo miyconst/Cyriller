@@ -35,12 +35,14 @@ namespace Cyriller.Desktop
                 .AddSingleton<Application>(app)
                 .AddSingleton<IClipboard>(app.Clipboard)
                 .AddSingleton<CyrCollectionContainer>()
+                .AddTransient<CyrName>()
 
                 .AddSingleton<MainWindowViewModel>()
                 .AddSingleton<MainWindow>()
 
                 .AddTransient<NounViewModel>()
                 .AddTransient<AdjectiveViewModel>()
+                .AddTransient<NameViewModel>()
 
                 .BuildServiceProvider();
 

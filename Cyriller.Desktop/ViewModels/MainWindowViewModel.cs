@@ -14,10 +14,12 @@ namespace Cyriller.Desktop.ViewModels
         protected string title = "Cyriller Desktop";
         protected bool isNounViewVisible = false;
         protected bool isAdjectiveVisible = false;
+        protected bool isNameVisible = false;
         protected Cursor cursor = Cursor.Default;
 
         public event EventHandler NounFormOpened;
         public event EventHandler AdjectiveFormOpened;
+        public event EventHandler NameFormOpened;
 
         public string Title
         {
@@ -34,16 +36,7 @@ namespace Cyriller.Desktop.ViewModels
         public bool IsNounViewVisible
         {
             get => this.isNounViewVisible;
-            set
-            {
-                if (!value)
-                {
-                    this.NounViewModel = null;
-                    this.RaisePropertyChanged(nameof(this.NounViewModel));
-                }
-
-                this.RaiseAndSetIfChanged(ref this.isNounViewVisible, value);
-            }
+            set => this.RaiseAndSetIfChanged(ref this.isNounViewVisible, value);
         }
 
         public bool IsAdjectiveVisible
@@ -52,9 +45,16 @@ namespace Cyriller.Desktop.ViewModels
             set => this.RaiseAndSetIfChanged(ref this.isAdjectiveVisible, value);
         }
 
+        public bool IsNameVisible
+        {
+            get => this.isNameVisible;
+            set => this.RaiseAndSetIfChanged(ref this.isNameVisible, value);
+        }
+
         public CyrCollectionContainer CyrCollectionContainer { get; protected set; }
         public NounViewModel NounViewModel { get; protected set; }
         public AdjectiveViewModel AdjectiveViewModel { get; protected set; }
+        public NameViewModel NameViewModel { get; protected set; }
 
         public MainWindowViewModel(CyrCollectionContainer container)
         {
@@ -72,11 +72,12 @@ namespace Cyriller.Desktop.ViewModels
             this.Busy();
             this.Cursor = new Cursor(StandardCursorType.Wait);
             this.Title = "Склонение существительного по падежам";
+            this.HideAll();
             this.IsNounViewVisible = true;
-            this.IsAdjectiveVisible = false;
 
             if (this.NounViewModel != null)
             {
+                this.OnFormOpened(this.NounFormOpened);
                 return;
             }
 
@@ -84,19 +85,19 @@ namespace Cyriller.Desktop.ViewModels
 
             this.NounViewModel = Program.ServiceProvider.GetService<NounViewModel>();
             this.RaisePropertyChanged(nameof(NounViewModel));
-            this.NounFormOpened?.Invoke(this, EventArgs.Empty);
-            this.Free();
+            this.OnFormOpened(this.NounFormOpened);
         }
 
         public async virtual void MenuItem_Decline_Adjective_Click()
         {
             this.Busy();
             this.Title = "Склонение прилагательного по падежам";
-            this.IsNounViewVisible = false;
+            this.HideAll();
             this.IsAdjectiveVisible = true;
 
             if (this.AdjectiveViewModel != null)
             {
+                this.OnFormOpened(this.AdjectiveFormOpened);
                 return;
             }
 
@@ -104,8 +105,32 @@ namespace Cyriller.Desktop.ViewModels
 
             this.AdjectiveViewModel = Program.ServiceProvider.GetService<AdjectiveViewModel>();
             this.RaisePropertyChanged(nameof(AdjectiveViewModel));
-            this.AdjectiveFormOpened?.Invoke(this, EventArgs.Empty);
-            this.Free();
+            this.OnFormOpened(this.AdjectiveFormOpened);
+        }
+
+        public virtual void MenuItem_Decline_Name_Click()
+        {
+            this.Busy();
+            this.title = "Склонение личных имен без использования словаря";
+            this.HideAll();
+            this.IsNameVisible = true;
+
+            if (this.NameViewModel != null)
+            {
+                this.OnFormOpened(this.NameFormOpened);
+                return;
+            }
+
+            this.NameViewModel = Program.ServiceProvider.GetService<NameViewModel>();
+            this.RaisePropertyChanged(nameof(NameViewModel));
+            this.OnFormOpened(this.NameFormOpened);
+        }
+
+        protected virtual void HideAll()
+        {
+            this.IsNounViewVisible = false;
+            this.IsAdjectiveVisible = false;
+            this.IsNameVisible = false;
         }
 
         protected virtual void Busy()
@@ -116,6 +141,12 @@ namespace Cyriller.Desktop.ViewModels
         protected virtual void Free()
         {
             this.Cursor = Cursor.Default;
+        }
+
+        protected virtual void OnFormOpened(EventHandler @event)
+        {
+            @event?.Invoke(this, EventArgs.Empty);
+            this.Free();
         }
     }
 }

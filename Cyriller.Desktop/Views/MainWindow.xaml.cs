@@ -11,6 +11,8 @@ namespace Cyriller.Desktop.Views
 {
     public class MainWindow : Window
     {
+        protected int FocusTimeout { get; set; } = 1;
+
         public MainWindow(MainWindowViewModel dataContext)
         {
             InitializeComponent();
@@ -18,19 +20,27 @@ namespace Cyriller.Desktop.Views
 
             dataContext.NounFormOpened += DataContext_NounFormOpened;
             dataContext.AdjectiveFormOpened += DataContext_AdjectiveFormOpened;
+            dataContext.NameFormOpened += DataContext_NameFormOpened;
+        }
+
+        private async void DataContext_NameFormOpened(object sender, EventArgs e)
+        {
+            // This delay is needed to focus element after UI is updated.
+            await Task.Delay(this.FocusTimeout);
+            this.Find<NameView>("ucName").Focus();
         }
 
         private async void DataContext_AdjectiveFormOpened(object sender, EventArgs e)
         {
             // This delay is needed to focus element after UI is updated.
-            await Task.Delay(1);
+            await Task.Delay(this.FocusTimeout);
             this.Find<AdjectiveView>("ucAdjective").Focus();
         }
 
         private async void DataContext_NounFormOpened(object sender, EventArgs e)
         {
             // This delay is needed to focus element after UI is updated.
-            await Task.Delay(1);
+            await Task.Delay(this.FocusTimeout);
             this.Find<NounView>("ucNoun").Focus();
         }
 
