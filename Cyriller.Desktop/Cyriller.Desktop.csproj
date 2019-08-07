@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <Version>0.1.0</Version>
     <Authors>Konstantin Mi (miyconst)</Authors>
@@ -11,6 +11,7 @@
     <PackageIconUrl>https://raw.githubusercontent.com/miyconst/Cyriller/master/Cyriller.Web/favicon.ico</PackageIconUrl>
     <RepositoryUrl>https://github.com/miyconst/Cyriller</RepositoryUrl>
     <PackageTags>склонение существительное прилагательное число падеж</PackageTags>
+    <ApplicationIcon>favicon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Compile Update="**\*.xaml.cs">
