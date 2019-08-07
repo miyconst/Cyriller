@@ -16,6 +16,7 @@ namespace Cyriller.Desktop.ViewModels
         protected bool isAdjectiveVisible = false;
         protected bool isNameVisible = false;
         protected bool isNumberVisible = false;
+        protected bool isPhraseVisible = false;
         protected bool isAboutVisible = true;
         protected Cursor cursor = Cursor.Default;
 
@@ -23,6 +24,7 @@ namespace Cyriller.Desktop.ViewModels
         public event EventHandler AdjectiveFormOpened;
         public event EventHandler NameFormOpened;
         public event EventHandler NumberFormOpened;
+        public event EventHandler PhraseFormOpened;
 
         public string Title
         {
@@ -60,6 +62,12 @@ namespace Cyriller.Desktop.ViewModels
             set => this.RaiseAndSetIfChanged(ref this.isNumberVisible, value);
         }
 
+        public bool IsPhraseVisible
+        {
+            get => this.isPhraseVisible;
+            set => this.RaiseAndSetIfChanged(ref this.isPhraseVisible, value);
+        }
+
         public bool IsAboutVisible
         {
             get => this.isAboutVisible;
@@ -71,6 +79,7 @@ namespace Cyriller.Desktop.ViewModels
         public AdjectiveViewModel AdjectiveViewModel { get; protected set; }
         public NameViewModel NameViewModel { get; protected set; }
         public NumberViewModel NumberViewModel { get; protected set; }
+        public PhraseViewModel PhraseViewModel { get; protected set; }
 
         public MainWindowViewModel(CyrCollectionContainer container)
         {
@@ -168,6 +177,26 @@ namespace Cyriller.Desktop.ViewModels
             this.OnFormOpened(this.NumberFormOpened);
         }
 
+        public async virtual void MenuItem_Decline_Phrase_Click()
+        {
+            this.Busy();
+            this.title = "Склонять словосочетание";
+            this.HideAll();
+            this.IsPhraseVisible = true;
+
+            if (this.PhraseViewModel != null)
+            {
+                this.OnFormOpened(this.PhraseFormOpened);
+                return;
+            }
+
+            await this.CyrCollectionContainer.InitOrDefault();
+
+            this.PhraseViewModel = Program.ServiceProvider.GetService<PhraseViewModel>();
+            this.RaisePropertyChanged(nameof(PhraseViewModel));
+            this.OnFormOpened(this.PhraseFormOpened);
+        }
+
         protected virtual void HideAll()
         {
             this.IsAboutVisible = false;
@@ -175,6 +204,7 @@ namespace Cyriller.Desktop.ViewModels
             this.IsAdjectiveVisible = false;
             this.IsNumberVisible = false;
             this.IsNameVisible = false;
+            this.IsPhraseVisible = false;
         }
 
         protected virtual void Busy()

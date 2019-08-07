@@ -58,6 +58,7 @@ namespace Cyriller.Desktop
                 .AddTransient<AdjectiveViewModel>()
                 .AddTransient<NameViewModel>()
                 .AddTransient<NumberViewModel>()
+                .AddTransient<PhraseViewModel>()
 
                 .BuildServiceProvider();
 

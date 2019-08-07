@@ -9,8 +9,8 @@
         x:Class="Cyriller.Desktop.Views.MainWindow"
         Icon="/Assets/favicon.ico"
         Title="{Binding Title}" Cursor="{Binding Cursor}">
-  <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto">
-    <Menu Grid.Row="0">
+  <StackPanel>
+    <Menu>
       <MenuItem Header="Кириллер">
         <MenuItem Header="О Программе (F1)" HotKey="F1" Command="{Binding MenuItem_About_Click}">
           <MenuItem.Icon>
@@ -35,12 +35,12 @@
             <Image Source="/Assets/adj-icon.png"></Image>
           </MenuItem.Icon>
         </MenuItem>
-        <MenuItem Header="Словосочетание"></MenuItem>
+        <MenuItem Header="Словосочетание (Ctrl + Shift + A)" Command="{Binding MenuItem_Decline_Phrase_Click}" HotKey="Ctrl+Shift+A"></MenuItem>
         <MenuItem Header="Число (Ctrl + Shift + X)" Command="{Binding MenuItem_Decline_Number_Click}" HotKey="Ctrl+Shift+X"></MenuItem>
         <MenuItem Header="Имя (Ctrl + Shift + B)" Command="{Binding MenuItem_Decline_Name_Click}" HotKey="Ctrl+Shift+B"></MenuItem>
       </MenuItem>
     </Menu>
-    <StackPanel Grid.Row="1" IsVisible="{Binding IsAboutVisible}" Margin="10">
+    <StackPanel IsVisible="{Binding IsAboutVisible}" Margin="10">
       <Image Source="/Assets/favicon.ico"></Image>
       <TextBlock FontSize="24" Margin="5,5,5,0">Кириллер</TextBlock>
       <TextBlock Margin="5,0,5,10">Бесплатная программа склонения по падежам</TextBlock>
@@ -63,17 +63,20 @@
         <Button Margin="5" Background="Transparent" BorderThickness="0" Foreground="Blue" Cursor="Hand">Лицензия использования - LGPL-3.0</Button>
       </StackPanel>
     </StackPanel>
-    <StackPanel Grid.Row="2" IsVisible="{Binding IsNounViewVisible}">
+    <StackPanel IsVisible="{Binding IsNounViewVisible}">
       <views:NounView DataContext="{Binding NounViewModel}" Name="ucNoun" />
     </StackPanel>
-    <StackPanel Grid.Row="3" IsVisible="{Binding IsAdjectiveVisible}">
+    <StackPanel IsVisible="{Binding IsAdjectiveVisible}">
       <views:AdjectiveView DataContext="{Binding AdjectiveViewModel}" Name="ucAdjective" />
     </StackPanel>
-    <StackPanel Grid.Row="4" IsVisible="{Binding IsNameVisible}">
+    <StackPanel IsVisible="{Binding IsNameVisible}">
       <views:NameView DataContext="{Binding NameViewModel}" Name="ucName" />
     </StackPanel>
-    <StackPanel Grid.Row="5" IsVisible="{Binding IsNumberVisible}">
-      <views:NumberView DataContext="{Binding NumberViewModel}" Name="ucNumber"></views:NumberView>
+    <StackPanel IsVisible="{Binding IsNumberVisible}">
+      <views:NumberView DataContext="{Binding NumberViewModel}" Name="ucNumber" />
     </StackPanel>
-  </Grid>
+    <StackPanel IsVisible="{Binding IsPhraseVisible}">
+      <views:PhraseView DataContext="{Binding PhraseViewModel}" Name="ucPhrase" />
+    </StackPanel>
+  </StackPanel>
 </Window>
