@@ -11,9 +11,10 @@ namespace Cyriller
     {
         public abstract class Currency
         {
-            public GendersEnum IntegerGender { get; set; }
-            public GendersEnum DecimalGender { get; set; }
-            public int Decimals { get; set; }
+            public virtual string Name { get; protected set; }
+            public virtual GendersEnum IntegerGender { get; protected set; }
+            public virtual GendersEnum DecimalGender { get; protected set; }
+            public virtual int Decimals { get; protected set; }
 
             public abstract string[] GetIntegerName(CasesEnum @case);
             public abstract string[] GetDecimalName(CasesEnum @case);
@@ -23,6 +24,7 @@ namespace Cyriller
         {
             public RurCurrency()
             {
+                this.Name = "Российский рубль (руб) ₽";
                 this.IntegerGender = GendersEnum.Masculine;
                 this.DecimalGender = GendersEnum.Feminine;
                 this.Decimals = 2;
@@ -75,6 +77,7 @@ namespace Cyriller
         {
             public UsdCurrency()
             {
+                this.Name = "Американский доллар (USD) $";
                 this.IntegerGender = GendersEnum.Masculine;
                 this.DecimalGender = GendersEnum.Masculine;
                 this.Decimals = 2;
@@ -127,6 +130,7 @@ namespace Cyriller
         {
             public EurCurrency()
             {
+                this.Name = "Евро (EUR) €";
                 this.IntegerGender = GendersEnum.Neuter;
                 this.DecimalGender = GendersEnum.Masculine;
                 this.Decimals = 2;
@@ -179,6 +183,7 @@ namespace Cyriller
         {
             public YuanCurrency()
             {
+                this.Name = "Китайский юань (CNY) ¥";
                 this.IntegerGender = GendersEnum.Masculine;
                 this.DecimalGender = GendersEnum.Masculine;
                 this.Decimals = 1;
