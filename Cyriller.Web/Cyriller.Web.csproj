@@ -223,6 +223,7 @@
     <Content Include="Views\Home\News.cshtml" />
     <Content Include="Views\Decline\List.cshtml" />
     <Content Include="Views\Decline\File.cshtml" />
+    <Content Include="Views\Shared\_Donate.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
