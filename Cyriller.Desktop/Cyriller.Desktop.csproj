@@ -71,6 +71,8 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Cyriller.Model\Cyriller.Model.csproj" />
+    <ProjectReference Include="..\Cyriller.Rule\Cyriller.Rule.csproj" />
     <ProjectReference Include="..\Cyriller\Cyriller.csproj" />
   </ItemGroup>
 </Project>

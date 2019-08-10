@@ -2,9 +2,10 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
+    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
     <PackageId>Miyconst.Cyriller</PackageId>
     <Version>0.1.0</Version>
-    <Description>Russian language declension library</Description>
+    <Description>Библиотека для склонения существительных, прилагательных, чисел и личных имен русского языка по падежам.</Description>
     <Company>http://www.miyconst.com/</Company>
     <Copyright>Copyright © Konstantin Mi 2014-2019</Copyright>
     <PackageLicenseUrl>https://github.com/miyconst/Cyriller/blob/master/LICENSE</PackageLicenseUrl>
@@ -12,7 +13,11 @@
     <RepositoryUrl>https://github.com/miyconst/Cyriller</RepositoryUrl>
     <PackageIconUrl>https://raw.githubusercontent.com/miyconst/Cyriller/master/Cyriller.Web/favicon.ico</PackageIconUrl>
     <Authors>Konstantin Mi (miyconst)</Authors>
-    <PackageTags>склонение существительное прилагательное число падеж</PackageTags>
+    <PackageTags>склонение существительное прилагательное число имя падеж</PackageTags>
+    <PackageReleaseNotes>Новая схема хранения и использования словарей с возможностью распознавания существительных и прилагательных во всех склонениях.
+Поддержка netstandard2.0 и net45 для использования в приложениях под управлением .NET Core и .NET Framework.
+
+Важно: API версии 0.1.0 не совместим с предыдущими версиями.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
@@ -34,8 +39,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Cyriller.Model\Cyriller.Model.csproj" />
-    <ProjectReference Include="..\Cyriller.Rule\Cyriller.Rule.csproj" />
+    <ProjectReference Include="..\Cyriller.Model\Cyriller.Model.csproj" PrivateAssets="All"></ProjectReference>
+    <ProjectReference Include="..\Cyriller.Rule\Cyriller.Rule.csproj" PrivateAssets="All"></ProjectReference>
   </ItemGroup>
 
   <ItemGroup>
@@ -67,4 +72,9 @@
     <Exec Command="dotnet run --no-build --no-restore --project $(ProjectDir)..\Cyriller.Zipper\Cyriller.Zipper.csproj $(ProjectDir)App_Data\nouns.txt $(ProjectDir)App_Data\nouns.gz OnlyIfSourceIsNewer&#xD;&#xA;dotnet run --no-build --no-restore --project $(ProjectDir)..\Cyriller.Zipper\Cyriller.Zipper.csproj $(ProjectDir)App_Data\adjectives.txt $(ProjectDir)App_Data\adjectives.gz OnlyIfSourceIsNewer" />
   </Target>
 
+  <Target Name="CopyProjectReferencesToPackage" DependsOnTargets="ResolveReferences">
+    <ItemGroup>
+      <BuildOutputInPackage Include="@(ReferenceCopyLocalPaths-&gt;WithMetadataValue('ReferenceSourceTarget', 'ProjectReference'))" />
+    </ItemGroup>
+  </Target>
 </Project>
