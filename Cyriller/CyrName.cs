@@ -116,7 +116,7 @@ namespace Cyriller
                 patronymic = patronymic.Substring(0, patronymic.Length - 5);
             }
 
-            if (patronymic.StartsWith("Оглы") || patronymic.StartsWith("Кызы"))
+            if (patronymic.EndsWith("оглы") || patronymic.EndsWith("кызы"))
             {
                 patronymicAfter = patronymic.Substring(patronymic.Length - 4);
                 patronymic = patronymic.Substring(0, patronymic.Length - 4);
