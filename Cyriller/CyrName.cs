@@ -110,16 +110,10 @@ namespace Cyriller
                 patronymic = patronymic.Substring(4);
             }
 
-            if (patronymic.EndsWith("-оглы") || patronymic.EndsWith("-кызы"))
+            if (patronymic.EndsWith("оглы") || patronymic.EndsWith("кызы"))
             {
                 patronymicAfter = patronymic.Substring(patronymic.Length - 5);
                 patronymic = patronymic.Substring(0, patronymic.Length - 5);
-            }
-
-            if (patronymic.EndsWith("оглы") || patronymic.EndsWith("кызы"))
-            {
-                patronymicAfter = patronymic.Substring(patronymic.Length - 4);
-                patronymic = patronymic.Substring(0, patronymic.Length - 4);
             }
 
             if (caseNumber < 1 || caseNumber > 6)
