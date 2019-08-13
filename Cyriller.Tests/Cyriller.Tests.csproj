@@ -50,6 +50,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CyrNameTests.cs" />
     <Compile Include="CyrRuleTests.cs" />
     <Compile Include="Model\AdjectiveDictionary.cs">
       <DependentUpon>Model.tt</DependentUpon>
