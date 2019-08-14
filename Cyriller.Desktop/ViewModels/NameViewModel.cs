@@ -59,6 +59,7 @@ namespace Cyriller.Desktop.ViewModels
         public NameViewModel(CyrName cyrName, Application application) : base(application)
         {
             this.CyrName = cyrName ?? throw new ArgumentNullException(nameof(cyrName));
+            this.InitDropDowns();
         }
 
         public void Decline()
@@ -89,7 +90,7 @@ namespace Cyriller.Desktop.ViewModels
 
             if (this.isManualPropertiesInput)
             {
-                result = this.CyrName.Decline(this.inputSurname, this.inputName, this.inputPatronymic, shorten: this.isShorten);
+                result = this.CyrName.Decline(this.inputSurname, this.inputName, this.inputPatronymic, gender: this.InputGender.Value, shorten: this.isShorten);
 
                 this.WordProperties.Add(new KeyValuePair<string, string>("Фамилия", this.inputSurname));
                 this.WordProperties.Add(new KeyValuePair<string, string>("Имя", this.inputName));
@@ -97,7 +98,7 @@ namespace Cyriller.Desktop.ViewModels
             }
             else
             {
-                result = this.CyrName.Decline(this.inputText, shorten: this.isShorten);
+                result = this.CyrName.Decline(this.inputText, gender: this.InputGender.Value, shorten: this.isShorten);
                 this.WordProperties.Add(new KeyValuePair<string, string>("Имя", fullName));
             }
 

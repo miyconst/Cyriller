@@ -7,14 +7,21 @@
   <DockPanel MinWidth="1000">
     <StackPanel Margin="10">
       <TextBlock FontWeight="Bold" FontSize="16" Margin="5">Склонять личное имя без словаря</TextBlock>
-      <Grid RowDefinitions="Auto" ColumnDefinitions="*,200">
+      <Grid RowDefinitions="Auto" ColumnDefinitions="*,Auto,Auto">
         <TextBox Text="{Binding InputText}" Grid.Column="0" Margin="5" Name="txtInputText" IsVisible="{Binding !IsManualPropertiesInput}" Watermark="Введите полное имя для склонения"></TextBox>
         <Grid RowDefinitions="Auto" ColumnDefinitions="*,*,*" Grid.Column="0" IsVisible="{Binding IsManualPropertiesInput}">
           <TextBox Text="{Binding InputSurname}" Grid.Column="0" Margin="5" Watermark="Фамилия" Name="txtSurname"></TextBox>
           <TextBox Text="{Binding InputName}" Grid.Column="1" Margin="5" Watermark="Имя"></TextBox>
           <TextBox Text="{Binding InputPatronymic}" Grid.Column="2" Margin="5" Watermark="Отчество"></TextBox>
         </Grid>
-        <Button Command="{Binding Decline}" Grid.Column="1" Margin="5" IsDefault="True" HotKey="F5">Склонять (F5)</Button>
+        <DropDown Margin="5" SelectionMode="AlwaysSelected" Grid.Column="1" Items="{Binding Genders}" SelectedItem="{Binding InputGender}">
+          <DropDown.ItemTemplate>
+            <DataTemplate>
+              <TextBlock Text="{Binding Name}" />
+            </DataTemplate>
+          </DropDown.ItemTemplate>
+        </DropDown>
+        <Button Command="{Binding Decline}" Grid.Column="2" Margin="5" IsDefault="True" HotKey="F5">Склонять (F5)</Button>
       </Grid>
       <Grid RowDefinitions="Auto" ColumnDefinitions="Auto,*">
         <CheckBox Grid.Column="1" Margin="5,10,5,10" IsChecked="{Binding IsManualPropertiesInput}">Ввести фамилию, имя и отчество отдельно</CheckBox>
