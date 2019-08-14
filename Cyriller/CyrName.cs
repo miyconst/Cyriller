@@ -3,12 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 using Cyriller.Model;
 
 namespace Cyriller
 {
     public class CyrName
     {
+        public virtual Regex PatronymicSuffixRegex { get; protected set; } = new Regex(@"([- ](((оглы)|(улы)|(уулу))|([кг]ызы)))$", RegexOptions.IgnoreCase);
+        public virtual Regex PatronymicPrefixRegex { get; protected set; } = new Regex(@"^(ибн[- ])", RegexOptions.IgnoreCase);
+
         /// <summary>
         /// Склоняет полное имя в указанный падеж.
         /// </summary>
@@ -101,26 +105,8 @@ namespace Cyriller
             surname = this.ProperCase(inputSurname);
             name = this.ProperCase(inputName);
             patronymic = this.ProperCase(inputPatronymic);
-            patronymicBefore = string.Empty;
-            patronymicAfter = string.Empty;
 
-            if (patronymic.StartsWith("Ибн"))
-            {
-                patronymicBefore = "ибн ";
-                patronymic = patronymic.Substring(4);
-            }
-
-            if (patronymic.EndsWith("-оглы") || patronymic.EndsWith("-кызы"))
-            {
-                patronymicAfter = patronymic.Substring(patronymic.Length - 5);
-                patronymic = patronymic.Substring(0, patronymic.Length - 5);
-            }
-
-            if (patronymic.StartsWith("Оглы") || patronymic.StartsWith("Кызы"))
-            {
-                patronymicAfter = patronymic.Substring(patronymic.Length - 4);
-                patronymic = patronymic.Substring(0, patronymic.Length - 4);
-            }
+            this.SplitPatronymic(patronymic, out patronymicBefore, out patronymic, out patronymicAfter);
 
             if (caseNumber < 1 || caseNumber > 6)
             {
@@ -2158,6 +2144,52 @@ namespace Cyriller
             return result;
         }
 
+
+
+        /// <summary>
+        /// Используется для разбивки составных отчеств, к примеру тюркские варианты Салим-оглы или Салим-кызы.
+        /// https://ru.wikipedia.org/wiki/%D0%9E%D1%82%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%BE
+        /// </summary>
+        /// <param name="fullPatronymic">Полное отчество. Примеры: "Салим-оглы", "Салим Оглы", "Ибн Салим".</param>
+        /// <param name="prefix">Возвращает префиксную часть составного отчества, которая не должна склоняться.</param>
+        /// <param name="patronymic">Возвращает основную часть отчества, которая может склоняться.</param>
+        /// <param name="after">Возвращает суффиксную часть составного отчества, которая не должна склоняться.</param>
+        public virtual void SplitPatronymic(string fullPatronymic, out string prefix, out string patronymic, out string suffix)
+        {
+            if (string.IsNullOrEmpty(fullPatronymic))
+            {
+                prefix = null;
+                patronymic = fullPatronymic;
+                suffix = null;
+                return;
+            }
+
+            Match prefixMatch = this.PatronymicPrefixRegex.Match(fullPatronymic);
+            Match suffixMatch = this.PatronymicSuffixRegex.Match(fullPatronymic);
+
+            patronymic = fullPatronymic;
+
+            if (prefixMatch.Success)
+            {
+                prefix = prefixMatch.Value;
+                patronymic = this.PatronymicPrefixRegex.Replace(patronymic, string.Empty);
+            }
+            else
+            {
+                prefix = null;
+            }
+
+            if (suffixMatch.Success)
+            {
+                suffix = suffixMatch.Value;
+                patronymic = this.PatronymicSuffixRegex.Replace(patronymic, string.Empty);
+            }
+            else
+            {
+                suffix = null;
+            }
+        }
+
         protected virtual string ProperCase(string value)
         {
             if (value != null)
@@ -2169,8 +2201,6 @@ namespace Cyriller
             {
                 return string.Empty;
             }
-
-            value = value.ToLower();
 
             return char.ToUpper(value[0]) + value.Substring(1);
         }

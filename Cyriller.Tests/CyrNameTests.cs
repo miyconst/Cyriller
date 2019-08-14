@@ -84,5 +84,324 @@ namespace Cyriller.Tests
             Assert.Equal("иванове", result);
         }
         #endregion
+
+        #region Patronymic declension.
+        [Fact]
+        public void MasculinePatronymicIsCorrectlyDeclinedInAccusativeCase()
+        {
+            string result = this.CyrName.DeclinePatronymicAccusative("иванович", null, false, false);
+            Assert.Equal("ивановича", result);
+
+            result = this.CyrName.DeclinePatronymicAccusative("салим", "оглы", false, false);
+            Assert.Equal("салим", result);
+        }
+
+        [Fact]
+        public void MasculinePatronymicIsCorrectlyDeclinedInDativeCase()
+        {
+            string result = this.CyrName.DeclinePatronymicDative("иванович", null, false, false);
+            Assert.Equal("ивановичу", result);
+
+            result = this.CyrName.DeclinePatronymicAccusative("салим", "оглы", false, false);
+            Assert.Equal("салим", result);
+        }
+
+        [Fact]
+        public void MasculinePatronymicIsCorrectlyDeclinedInGenitiveCase()
+        {
+            string result = this.CyrName.DeclinePatronymicGenitive("иванович", null, false, false);
+            Assert.Equal("ивановича", result);
+
+            result = this.CyrName.DeclinePatronymicAccusative("салим", "оглы", false, false);
+            Assert.Equal("салим", result);
+        }
+
+        [Fact]
+        public void MasculinePatronymicIsCorrectlyDeclinedInInstrumentalCase()
+        {
+            string result = this.CyrName.DeclinePatronymicInstrumental("иванович", null, false, false);
+            Assert.Equal("ивановичем", result);
+
+            result = this.CyrName.DeclinePatronymicAccusative("салим", "оглы", false, false);
+            Assert.Equal("салим", result);
+        }
+
+        [Fact]
+        public void MasculinePatronymicIsCorrectlyDeclinedInPrepositionalCase()
+        {
+            string result = this.CyrName.DeclinePatronymicPrepositional("иванович", null, false, false);
+            Assert.Equal("ивановиче", result);
+
+            result = this.CyrName.DeclinePatronymicAccusative("салим", "оглы", false, false);
+            Assert.Equal("салим", result);
+        }
+        #endregion
+
+        #region Patronymic parts.
+        [Fact]
+        public void PatronymicEmptySplitIntoPartsCorrectly()
+        {
+            string prefix;
+            string patronymic;
+            string suffix;
+
+            {
+                this.CyrName.SplitPatronymic(string.Empty, out prefix, out patronymic, out suffix);
+
+                Assert.Null(prefix);
+                Assert.Equal(string.Empty, patronymic);
+                Assert.Null(suffix);
+            }
+
+            {
+                this.CyrName.SplitPatronymic(null, out prefix, out patronymic, out suffix);
+
+                Assert.Null(prefix);
+                Assert.Null(patronymic);
+                Assert.Null(suffix);
+            }
+
+            {
+                this.CyrName.SplitPatronymic(" ", out prefix, out patronymic, out suffix);
+
+                Assert.Null(prefix);
+                Assert.Equal(" ", patronymic);
+                Assert.Null(suffix);
+            }
+        }
+
+        [Fact]
+        public void PatronymicIbnSplitIntoPartsCorrectly()
+        {
+            string prefix;
+            string patronymic;
+            string suffix;
+
+            {
+                this.CyrName.SplitPatronymic("Ибн Салим", out prefix, out patronymic, out suffix);
+
+                Assert.Equal("Ибн ", prefix);
+                Assert.Equal("Салим", patronymic);
+                Assert.Null(suffix);
+            }
+
+            {
+                this.CyrName.SplitPatronymic("Ибн-Салим", out prefix, out patronymic, out suffix);
+
+                Assert.Equal("Ибн-", prefix);
+                Assert.Equal("Салим", patronymic);
+                Assert.Null(suffix);
+            }
+
+            {
+                this.CyrName.SplitPatronymic("Ибн-салим", out prefix, out patronymic, out suffix);
+
+                Assert.Equal("Ибн-", prefix);
+                Assert.Equal("салим", patronymic);
+                Assert.Null(suffix);
+            }
+        }
+
+
+        [Fact]
+        public void PatronymicOglySplitIntoPartsCorrectly()
+        {
+            string prefix;
+            string patronymic;
+            string suffix;
+
+            {
+                this.CyrName.SplitPatronymic("Салим Оглы", out prefix, out patronymic, out suffix);
+
+                Assert.Null(prefix);
+                Assert.Equal("Салим", patronymic);
+                Assert.Equal(" Оглы", suffix);
+            }
+
+            {
+                this.CyrName.SplitPatronymic("Салим оглы", out prefix, out patronymic, out suffix);
+
+                Assert.Null(prefix);
+                Assert.Equal("Салим", patronymic);
+                Assert.Equal(" оглы", suffix);
+            }
+
+            {
+                this.CyrName.SplitPatronymic("Салим-Оглы", out prefix, out patronymic, out suffix);
+
+                Assert.Null(prefix);
+                Assert.Equal("Салим", patronymic);
+                Assert.Equal("-Оглы", suffix);
+            }
+
+            {
+                this.CyrName.SplitPatronymic("Салим-оглы", out prefix, out patronymic, out suffix);
+
+                Assert.Null(prefix);
+                Assert.Equal("Салим", patronymic);
+                Assert.Equal("-оглы", suffix);
+            }
+        }
+
+        [Fact]
+        public void PatronymicUlySplitIntoPartsCorrectly()
+        {
+            string prefix;
+            string patronymic;
+            string suffix;
+
+            {
+                this.CyrName.SplitPatronymic("Салим Улы", out prefix, out patronymic, out suffix);
+
+                Assert.Null(prefix);
+                Assert.Equal("Салим", patronymic);
+                Assert.Equal(" Улы", suffix);
+            }
+
+            {
+                this.CyrName.SplitPatronymic("Салим улы", out prefix, out patronymic, out suffix);
+
+                Assert.Null(prefix);
+                Assert.Equal("Салим", patronymic);
+                Assert.Equal(" улы", suffix);
+            }
+
+            {
+                this.CyrName.SplitPatronymic("Салим-Улы", out prefix, out patronymic, out suffix);
+
+                Assert.Null(prefix);
+                Assert.Equal("Салим", patronymic);
+                Assert.Equal("-Улы", suffix);
+            }
+
+            {
+                this.CyrName.SplitPatronymic("Салим-улы", out prefix, out patronymic, out suffix);
+
+                Assert.Null(prefix);
+                Assert.Equal("Салим", patronymic);
+                Assert.Equal("-улы", suffix);
+            }
+        }
+
+        [Fact]
+        public void PatronymicUulуSplitIntoPartsCorrectly()
+        {
+            string prefix;
+            string patronymic;
+            string suffix;
+
+            {
+                this.CyrName.SplitPatronymic("Салим Уулу", out prefix, out patronymic, out suffix);
+
+                Assert.Null(prefix);
+                Assert.Equal("Салим", patronymic);
+                Assert.Equal(" Уулу", suffix);
+            }
+
+            {
+                this.CyrName.SplitPatronymic("Салим уулу", out prefix, out patronymic, out suffix);
+
+                Assert.Null(prefix);
+                Assert.Equal("Салим", patronymic);
+                Assert.Equal(" уулу", suffix);
+            }
+
+            {
+                this.CyrName.SplitPatronymic("Салим-Уулу", out prefix, out patronymic, out suffix);
+
+                Assert.Null(prefix);
+                Assert.Equal("Салим", patronymic);
+                Assert.Equal("-Уулу", suffix);
+            }
+
+            {
+                this.CyrName.SplitPatronymic("Салим-уулу", out prefix, out patronymic, out suffix);
+
+                Assert.Null(prefix);
+                Assert.Equal("Салим", patronymic);
+                Assert.Equal("-уулу", suffix);
+            }
+        }
+
+        [Fact]
+        public void PatronymicKyzySplitIntoPartsCorrectly()
+        {
+            string prefix;
+            string patronymic;
+            string suffix;
+
+            {
+                this.CyrName.SplitPatronymic("Салим Кызы", out prefix, out patronymic, out suffix);
+
+                Assert.Null(prefix);
+                Assert.Equal("Салим", patronymic);
+                Assert.Equal(" Кызы", suffix);
+            }
+
+            {
+                this.CyrName.SplitPatronymic("Салим кызы", out prefix, out patronymic, out suffix);
+
+                Assert.Null(prefix);
+                Assert.Equal("Салим", patronymic);
+                Assert.Equal(" кызы", suffix);
+            }
+
+            {
+                this.CyrName.SplitPatronymic("Салим-Кызы", out prefix, out patronymic, out suffix);
+
+                Assert.Null(prefix);
+                Assert.Equal("Салим", patronymic);
+                Assert.Equal("-Кызы", suffix);
+            }
+
+            {
+                this.CyrName.SplitPatronymic("Салим-кызы", out prefix, out patronymic, out suffix);
+
+                Assert.Null(prefix);
+                Assert.Equal("Салим", patronymic);
+                Assert.Equal("-кызы", suffix);
+            }
+        }
+
+        [Fact]
+        public void PatronymicGyzySplitIntoPartsCorrectly()
+        {
+            string prefix;
+            string patronymic;
+            string suffix;
+
+            {
+                this.CyrName.SplitPatronymic("Салим Гызы", out prefix, out patronymic, out suffix);
+
+                Assert.Null(prefix);
+                Assert.Equal("Салим", patronymic);
+                Assert.Equal(" Гызы", suffix);
+            }
+
+            {
+                this.CyrName.SplitPatronymic("Салим гызы", out prefix, out patronymic, out suffix);
+
+                Assert.Null(prefix);
+                Assert.Equal("Салим", patronymic);
+                Assert.Equal(" гызы", suffix);
+            }
+
+            {
+                this.CyrName.SplitPatronymic("Салим-Гызы", out prefix, out patronymic, out suffix);
+
+                Assert.Null(prefix);
+                Assert.Equal("Салим", patronymic);
+                Assert.Equal("-Гызы", suffix);
+            }
+
+            {
+                this.CyrName.SplitPatronymic("Салим-гызы", out prefix, out patronymic, out suffix);
+
+                Assert.Null(prefix);
+                Assert.Equal("Салим", patronymic);
+                Assert.Equal("-гызы", suffix);
+            }
+        }
+        #endregion
     }
 }
