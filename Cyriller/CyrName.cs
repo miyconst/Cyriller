@@ -94,6 +94,7 @@ namespace Cyriller
             string patronymic = null;
             string patronymicAfter = null;
             string patronymicBefore = null;
+            bool declinePatronymic = true;
             int gender = 0;
             bool isFeminine = false;
             int index = 0;
@@ -104,9 +105,10 @@ namespace Cyriller
             gender = inputGender;
             surname = this.ProperCase(inputSurname);
             name = this.ProperCase(inputName);
-            patronymic = this.ProperCase(inputPatronymic);
 
-            this.SplitPatronymic(patronymic, out patronymicBefore, out patronymic, out patronymicAfter);
+            this.SplitPatronymic(inputPatronymic, out patronymicBefore, out patronymic, out patronymicAfter);
+            declinePatronymic = string.IsNullOrEmpty(patronymicAfter);
+            patronymic = this.ProperCase(patronymic);
 
             if (caseNumber < 1 || caseNumber > 6)
             {
@@ -152,27 +154,47 @@ namespace Cyriller
                     break;
                 case 2:
                     name = this.DeclineNameGenitive(name, isFeminine, inputShorten);
-                    patronymic = this.DeclinePatronymicGenitive(patronymic, patronymicAfter, isFeminine, inputShorten);
+
+                    if (declinePatronymic || inputShorten)
+                    {
+                        patronymic = this.DeclinePatronymicGenitive(patronymic, isFeminine, inputShorten);
+                    }
                     break;
 
                 case 3:
                     name = this.DeclineNameDative(name, isFeminine, inputShorten);
-                    patronymic = this.DeclinePatronymicDative(patronymic, patronymicAfter, isFeminine, inputShorten);
+
+                    if (declinePatronymic || inputShorten)
+                    {
+                        patronymic = this.DeclinePatronymicDative(patronymic, isFeminine, inputShorten);
+                    }
                     break;
 
                 case 4:
                     name = this.DeclineNameAccusative(name, isFeminine, inputShorten);
-                    patronymic = this.DeclinePatronymicAccusative(patronymic, patronymicAfter, isFeminine, inputShorten);
+
+                    if (declinePatronymic || inputShorten)
+                    {
+                        patronymic = this.DeclinePatronymicAccusative(patronymic, isFeminine, inputShorten);
+                    }
                     break;
 
                 case 5:
                     name = this.DeclineNameInstrumental(name, isFeminine, inputShorten);
-                    patronymic = this.DeclinePatronymicInstrumental(patronymic, patronymicAfter, isFeminine, inputShorten);
+
+                    if (declinePatronymic || inputShorten)
+                    {
+                        patronymic = this.DeclinePatronymicInstrumental(patronymic, isFeminine, inputShorten);
+                    }
                     break;
 
                 case 6:
                     name = this.DeclineNamePrepositional(name, isFeminine, inputShorten);
-                    patronymic = this.DeclinePatronymicPrepositional(patronymic, patronymicAfter, isFeminine, inputShorten);
+
+                    if (declinePatronymic || inputShorten)
+                    {
+                        patronymic = this.DeclinePatronymicPrepositional(patronymic, isFeminine, inputShorten);
+                    }
                     break;
             }
 
@@ -206,52 +228,52 @@ namespace Cyriller
 
             if (spaceIndex > 0)
             {
-                str1 = fullName.Substring(0, spaceIndex).Trim().ToLower();
+                str1 = fullName.Substring(0, spaceIndex).Trim();
                 fullName = fullName.Substring(spaceIndex).Trim();
 
                 spaceIndex = fullName.IndexOf(" ");
 
                 if (spaceIndex > 0)
                 {
-                    str2 = fullName.Substring(0, spaceIndex).Trim().ToLower();
-                    str3 = fullName.Substring(spaceIndex).Trim().ToLower();
+                    str2 = fullName.Substring(0, spaceIndex).Trim();
+                    str3 = fullName.Substring(spaceIndex).Trim();
                 }
                 else
                 {
-                    str2 = fullName.Trim().ToLower();
+                    str2 = fullName.Trim();
                 }
             }
             else
             {
-                str1 = fullName.Trim().ToLower();
+                str1 = fullName.Trim();
             }
 
             if (!string.IsNullOrEmpty(str3))
             {
                 if (str2.EndsWith("ич") || str2.EndsWith("вна") || str2.EndsWith("чна"))
                 {
-                    surname = this.ProperCase(str3);
-                    name = this.ProperCase(str1);
-                    patronymic = this.ProperCase(str2);
+                    surname = str3;
+                    name = str1;
+                    patronymic = str2;
                 }
                 else
                 {
-                    surname = this.ProperCase(str1);
-                    name = this.ProperCase(str2);
-                    patronymic = this.ProperCase(str3);
+                    surname = str1;
+                    name = str2;
+                    patronymic = str3;
                 }
             }
             else if (!string.IsNullOrEmpty(str2))
             {
                 if (str2.EndsWith("ич") || str2.EndsWith("вна") || str2.EndsWith("чна"))
                 {
-                    name = this.ProperCase(str1); ;
-                    patronymic = this.ProperCase(str2);
+                    name = str1; ;
+                    patronymic = str2;
                 }
                 else
                 {
-                    surname = this.ProperCase(str1);
-                    name = this.ProperCase(str2);
+                    surname = str1;
+                    name = str2;
                 }
             }
             else
@@ -700,14 +722,10 @@ namespace Cyriller
         /// Родительный, Кого? Чего? (нет)
         /// </summary>
         /// <param name="patronymic">Отчество, для склонения.</param>
-        /// <param name="patronymicAfter">
-        /// Используется для составных отчеств, к примеру тюркские варианты Салим-оглы или Салим-кызы.
-        /// https://ru.wikipedia.org/wiki/%D0%9E%D1%82%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%BE
-        /// </param>
         /// <param name="isFeminine">True, для женских отчеств.</param>
         /// <param name="shorten">Сократить ли отчество, к примеру, Иванович будет И.</param>
         /// <returns>Возвращает результат склонения.</returns>
-        public virtual string DeclinePatronymicGenitive(string patronymic, string patronymicAfter, bool isFeminine, bool shorten)
+        public virtual string DeclinePatronymicGenitive(string patronymic, bool isFeminine, bool shorten)
         {
             if (this.IsShorten(patronymic))
             {
@@ -720,34 +738,31 @@ namespace Cyriller
             }
             else
             {
-                if (string.IsNullOrEmpty(patronymicAfter))
+                switch (SubstringRight(patronymic, 1))
                 {
-                    switch (SubstringRight(patronymic, 1))
-                    {
-                        case "а":
-                            patronymic = SetEnd(patronymic, "ы");
-                            break;
-                        case "е":
-                        case "ё":
-                        case "и":
-                        case "о":
-                        case "у":
-                        case "э":
-                        case "ю":
-                            break;
-                        case "я":
-                            patronymic = SetEnd(patronymic, "и");
-                            break;
-                        case "ь":
-                            patronymic = SetEnd(patronymic, (isFeminine ? "и" : "я"));
-                            break;
-                        default:
-                            if (!isFeminine)
-                            {
-                                patronymic = patronymic + "а";
-                            }
-                            break;
-                    }
+                    case "а":
+                        patronymic = SetEnd(patronymic, "ы");
+                        break;
+                    case "е":
+                    case "ё":
+                    case "и":
+                    case "о":
+                    case "у":
+                    case "э":
+                    case "ю":
+                        break;
+                    case "я":
+                        patronymic = SetEnd(patronymic, "и");
+                        break;
+                    case "ь":
+                        patronymic = SetEnd(patronymic, (isFeminine ? "и" : "я"));
+                        break;
+                    default:
+                        if (!isFeminine)
+                        {
+                            patronymic = patronymic + "а";
+                        }
+                        break;
                 }
             }
 
@@ -758,14 +773,10 @@ namespace Cyriller
         /// Дательный, Кому? Чему? (дам)
         /// </summary>
         /// <param name="patronymic">Отчество, для склонения.</param>
-        /// <param name="patronymicAfter">
-        /// Используется для составных отчеств, к примеру тюркские варианты Салим-оглы или Салим-кызы.
-        /// https://ru.wikipedia.org/wiki/%D0%9E%D1%82%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%BE
-        /// </param>
         /// <param name="isFeminine">True, для женских отчеств.</param>
         /// <param name="shorten">Сократить ли отчество, к примеру, Иванович будет И.</param>
         /// <returns>Возвращает результат склонения.</returns>
-        public virtual string DeclinePatronymicDative(string patronymic, string patronymicAfter, bool isFeminine, bool shorten)
+        public virtual string DeclinePatronymicDative(string patronymic, bool isFeminine, bool shorten)
         {
             if (this.IsShorten(patronymic))
             {
@@ -778,32 +789,29 @@ namespace Cyriller
             }
             else
             {
-                if (string.IsNullOrEmpty(patronymicAfter))
+                switch (SubstringRight(patronymic, 1))
                 {
-                    switch (SubstringRight(patronymic, 1))
-                    {
-                        case "а":
-                        case "я":
-                            patronymic = SetEnd(patronymic, "е");
-                            break;
-                        case "е":
-                        case "ё":
-                        case "и":
-                        case "о":
-                        case "у":
-                        case "э":
-                        case "ю":
-                            break;
-                        case "ь":
-                            patronymic = SetEnd(patronymic, (isFeminine ? "и" : "ю"));
-                            break;
-                        default:
-                            if (!isFeminine)
-                            {
-                                patronymic = patronymic + "у";
-                            }
-                            break;
-                    }
+                    case "а":
+                    case "я":
+                        patronymic = SetEnd(patronymic, "е");
+                        break;
+                    case "е":
+                    case "ё":
+                    case "и":
+                    case "о":
+                    case "у":
+                    case "э":
+                    case "ю":
+                        break;
+                    case "ь":
+                        patronymic = SetEnd(patronymic, (isFeminine ? "и" : "ю"));
+                        break;
+                    default:
+                        if (!isFeminine)
+                        {
+                            patronymic = patronymic + "у";
+                        }
+                        break;
                 }
             }
 
@@ -814,14 +822,10 @@ namespace Cyriller
         /// Винительный, Кого? Что? (вижу)
         /// </summary>
         /// <param name="patronymic">Отчество, для склонения.</param>
-        /// <param name="patronymicAfter">
-        /// Используется для составных отчеств, к примеру тюркские варианты Салим-оглы или Салим-кызы.
-        /// https://ru.wikipedia.org/wiki/%D0%9E%D1%82%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%BE
-        /// </param>
         /// <param name="isFeminine">True, для женских отчеств.</param>
         /// <param name="shorten">Сократить ли отчество, к примеру, Иванович будет И.</param>
         /// <returns>Возвращает результат склонения.</returns>
-        public virtual string DeclinePatronymicAccusative(string patronymic, string patronymicAfter, bool isFeminine, bool shorten)
+        public virtual string DeclinePatronymicAccusative(string patronymic, bool isFeminine, bool shorten)
         {
             if (this.IsShorten(patronymic))
             {
@@ -834,33 +838,30 @@ namespace Cyriller
             }
             else
             {
-                if (string.IsNullOrEmpty(patronymicAfter))
+                switch (SubstringRight(patronymic, 1))
                 {
-                    switch (SubstringRight(patronymic, 1))
-                    {
-                        case "а":
-                            patronymic = SetEnd(patronymic, "у");
-                            break;
-                        case "е":
-                        case "ё":
-                        case "и":
-                        case "о":
-                        case "у":
-                        case "э":
-                        case "ю":
-                            break;
-                        case "я":
-                            patronymic = SetEnd(patronymic, "ю");
-                            break;
-                        case "ь":
-                            if (!isFeminine)
-                                patronymic = SetEnd(patronymic, "я");
-                            break;
-                        default:
-                            if (!isFeminine)
-                                patronymic = patronymic + "а";
-                            break;
-                    }
+                    case "а":
+                        patronymic = SetEnd(patronymic, "у");
+                        break;
+                    case "е":
+                    case "ё":
+                    case "и":
+                    case "о":
+                    case "у":
+                    case "э":
+                    case "ю":
+                        break;
+                    case "я":
+                        patronymic = SetEnd(patronymic, "ю");
+                        break;
+                    case "ь":
+                        if (!isFeminine)
+                            patronymic = SetEnd(patronymic, "я");
+                        break;
+                    default:
+                        if (!isFeminine)
+                            patronymic = patronymic + "а";
+                        break;
                 }
             }
 
@@ -871,14 +872,10 @@ namespace Cyriller
         /// Творительный, Кем? Чем? (горжусь)
         /// </summary>
         /// <param name="patronymic">Отчество, для склонения.</param>
-        /// <param name="patronymicAfter">
-        /// Используется для составных отчеств, к примеру тюркские варианты Салим-оглы или Салим-кызы.
-        /// https://ru.wikipedia.org/wiki/%D0%9E%D1%82%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%BE
-        /// </param>
         /// <param name="isFeminine">True, для женских отчеств.</param>
         /// <param name="shorten">Сократить ли отчество, к примеру, Иванович будет И.</param>
         /// <returns>Возвращает результат склонения.</returns>
-        public virtual string DeclinePatronymicInstrumental(string patronymic, string patronymicAfter, bool isFeminine, bool shorten)
+        public virtual string DeclinePatronymicInstrumental(string patronymic, bool isFeminine, bool shorten)
         {
             string temp;
 
@@ -893,48 +890,45 @@ namespace Cyriller
             }
             else
             {
-                if (string.IsNullOrEmpty(patronymicAfter))
+                temp = patronymic;
+
+                switch (SubstringRight(patronymic, 2))
                 {
-                    temp = patronymic;
+                    case "ич":
+                        patronymic = patronymic + (patronymic.ToLower() == "ильич" ? "ом" : "ем");
+                        break;
+                    case "на":
+                        patronymic = SetEnd(patronymic, 2, "ной");
+                        break;
+                }
 
-                    switch (SubstringRight(patronymic, 2))
+                if (patronymic == temp)
+                {
+                    switch (SubstringRight(patronymic, 1))
                     {
-                        case "ич":
-                            patronymic = patronymic + (patronymic.ToLower() == "ильич" ? "ом" : "ем");
+                        case "а":
+                            patronymic = SetEnd(patronymic, 1, "ой");
                             break;
-                        case "на":
-                            patronymic = SetEnd(patronymic, 2, "ной");
+                        case "е":
+                        case "ё":
+                        case "и":
+                        case "о":
+                        case "у":
+                        case "э":
+                        case "ю":
                             break;
-                    }
-
-                    if (patronymic == temp)
-                    {
-                        switch (SubstringRight(patronymic, 1))
-                        {
-                            case "а":
-                                patronymic = SetEnd(patronymic, 1, "ой");
-                                break;
-                            case "е":
-                            case "ё":
-                            case "и":
-                            case "о":
-                            case "у":
-                            case "э":
-                            case "ю":
-                                break;
-                            case "я":
-                                patronymic = SetEnd(patronymic, 1, "ей");
-                                break;
-                            case "ь":
-                                patronymic = SetEnd(patronymic, 1, (isFeminine ? "ью" : "ем"));
-                                break;
-                            default:
-                                if (!isFeminine)
-                                {
-                                    patronymic = patronymic + "ом";
-                                }
-                                break;
-                        }
+                        case "я":
+                            patronymic = SetEnd(patronymic, 1, "ей");
+                            break;
+                        case "ь":
+                            patronymic = SetEnd(patronymic, 1, (isFeminine ? "ью" : "ем"));
+                            break;
+                        default:
+                            if (!isFeminine)
+                            {
+                                patronymic = patronymic + "ом";
+                            }
+                            break;
                     }
                 }
             }
@@ -946,14 +940,10 @@ namespace Cyriller
         /// Творительный, Кем? Чем? (горжусь)
         /// </summary>
         /// <param name="patronymic">Отчество, для склонения.</param>
-        /// <param name="patronymicAfter">
-        /// Используется для составных отчеств, к примеру тюркские варианты Салим-оглы или Салим-кызы.
-        /// https://ru.wikipedia.org/wiki/%D0%9E%D1%82%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%BE
-        /// </param>
         /// <param name="isFeminine">True, для женских отчеств.</param>
         /// <param name="shorten">Сократить ли отчество, к примеру, Иванович будет И.</param>
         /// <returns>Возвращает результат склонения.</returns>
-        public virtual string DeclinePatronymicPrepositional(string patronymic, string patronymicAfter, bool isFeminine, bool shorten)
+        public virtual string DeclinePatronymicPrepositional(string patronymic, bool isFeminine, bool shorten)
         {
             if (this.IsShorten(patronymic))
             {
@@ -966,32 +956,29 @@ namespace Cyriller
             }
             else
             {
-                if (string.IsNullOrEmpty(patronymicAfter))
+                switch (SubstringRight(patronymic, 1))
                 {
-                    switch (SubstringRight(patronymic, 1))
-                    {
-                        case "а":
-                        case "я":
-                            patronymic = SetEnd(patronymic, "е");
-                            break;
-                        case "е":
-                        case "ё":
-                        case "и":
-                        case "о":
-                        case "у":
-                        case "э":
-                        case "ю":
-                            break;
-                        case "ь":
-                            patronymic = SetEnd(patronymic, (isFeminine ? "и" : "е"));
-                            break;
-                        default:
-                            if (!isFeminine)
-                            {
-                                patronymic = patronymic + "е";
-                            }
-                            break;
-                    }
+                    case "а":
+                    case "я":
+                        patronymic = SetEnd(patronymic, "е");
+                        break;
+                    case "е":
+                    case "ё":
+                    case "и":
+                    case "о":
+                    case "у":
+                    case "э":
+                    case "ю":
+                        break;
+                    case "ь":
+                        patronymic = SetEnd(patronymic, (isFeminine ? "и" : "е"));
+                        break;
+                    default:
+                        if (!isFeminine)
+                        {
+                            patronymic = patronymic + "е";
+                        }
+                        break;
                 }
             }
 
@@ -2143,8 +2130,6 @@ namespace Cyriller
 
             return result;
         }
-
-
 
         /// <summary>
         /// Используется для разбивки составных отчеств, к примеру тюркские варианты Салим-оглы или Салим-кызы.
